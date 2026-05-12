@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="site.title">环球贸易 | GlobalTrade Co.</title>
+  <link rel="icon" id="siteFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="logo" id="logoLink">
+      <img src="" alt="Logo" class="logo-img" id="logoImg" style="display:none;height:40px;width:auto;object-fit:contain">
+      <span class="logo-icon" id="logoIconDefault">⬡</span>
+      <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link active" data-i18n="nav.home">首页</a>
+      <a href="products.html" class="nav-link" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" class="nav-link" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" class="nav-link" data-i18n="nav.contact">联系我们</a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+        <span class="lang-zh">中文</span>
+        <span class="lang-divider">|</span>
+        <span class="lang-en">EN</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" data-i18n="nav.home">首页</a>
+    <a href="products.html" data-i18n="nav.products">产品介绍</a>
+    <a href="about.html" data-i18n="nav.about">关于我们</a>
+    <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?w=1600&q=80" alt="hero" class="hero-img" data-editable-img="hero.image">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag" data-editable="hero.tag" data-i18n="hero.tag">全球领先的贸易伙伴</div>
+    <h1 class="hero-title" data-editable="hero.title" data-i18n="hero.title">连接世界<br>共创未来</h1>
+    <p class="hero-desc" data-editable="hero.desc" data-i18n="hero.desc">专注国际贸易20余年，为全球客户提供优质产品与一站式供应链解决方案</p>
+    <div class="hero-actions">
+      <a href="products.html" class="btn btn-primary" data-editable="hero.btn1" data-i18n="hero.btn1" data-btn-key="hero.btn1">探索产品</a>
+      <a href="contact.html" class="btn btn-outline" data-editable="hero.btn2" data-i18n="hero.btn2" data-btn-key="hero.btn2">立即联系</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span data-i18n="hero.scroll">向下探索</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" data-editable="stats.years">20<span>+</span></div>
+    <div class="stat-label" data-editable="stats.yearsLabel" data-i18n="stats.years">年行业经验</div>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-num" data-editable="stats.countries">80<span>+</span></div>
+    <div class="stat-label" data-editable="stats.countriesLabel" data-i18n="stats.countries">覆盖国家地区</div>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-num" data-editable="stats.clients">5000<span>+</span></div>
+    <div class="stat-label" data-editable="stats.clientsLabel" data-i18n="stats.clients">全球合作客户</div>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-num" data-editable="stats.products">1200<span>+</span></div>
+    <div class="stat-label" data-editable="stats.productsLabel" data-i18n="stats.products">产品品类</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" data-i18n="features.tag">我们的优势</div>
+      <h2 class="section-title" data-editable="features.title" data-i18n="features.title">为何选择我们</h2>
+      <p class="section-sub" data-editable="features.sub" data-i18n="features.sub">多年深耕国际贸易领域，打造值得信赖的全球供应链</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3 data-editable="feat1.title" data-i18n="feat1.title">全球网络</h3>
+        <p data-editable="feat1.desc" data-i18n="feat1.desc">覆盖80+国家的完善贸易网络，本地化服务团队随时响应您的需求</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔬</div>
+        <h3 data-editable="feat2.title" data-i18n="feat2.title">品质保障</h3>
+        <p data-editable="feat2.desc" data-i18n="feat2.desc">严苛的质量管控体系，通过ISO9001认证，每一件产品都经过严格检测</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3 data-editable="feat3.title" data-i18n="feat3.title">高效交付</h3>
+        <p data-editable="feat3.desc" data-i18n="feat3.desc">完善的物流体系与仓储网络，确保订单准时交付，响应迅速</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3 data-editable="feat4.title" data-i18n="feat4.title">专业服务</h3>
+        <p data-editable="feat4.desc" data-i18n="feat4.desc">经验丰富的贸易专家团队，提供从询价到售后的全流程专业支持</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section products-preview">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" data-i18n="featured.tag">精选产品</div>
+      <h2 class="section-title" data-editable="featured.title" data-i18n="featured.title">热门产品推荐</h2>
+    </div>
+    <div class="products-preview-grid">
+      <div class="product-preview-card">
+        <div class="pp-img-wrap">
+          <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80" alt="product" data-editable-img="fp1.image">
+        </div>
+        <div class="pp-info">
+          <div class="pp-cat" data-i18n="fp1.cat">电子产品</div>
+          <h3 data-editable="fp1.name" data-i18n="fp1.name">智能控制模块</h3>
+          <p data-editable="fp1.desc" data-i18n="fp1.desc">高性能工业级智能控制模块，适用于各类自动化场景</p>
+        </div>
+      </div>
+      <div class="product-preview-card">
+        <div class="pp-img-wrap">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="product" data-editable-img="fp2.image">
+        </div>
+        <div class="pp-info">
+          <div class="pp-cat" data-i18n="fp2.cat">机械配件</div>
+          <h3 data-editable="fp2.name" data-i18n="fp2.name">精密轴承组件</h3>
+          <p data-editable="fp2.desc" data-i18n="fp2.desc">采用优质钢材，精密加工，耐磨耐用，适用于高负载环境</p>
+        </div>
+      </div>
+      <div class="product-preview-card">
+        <div class="pp-img-wrap">
+          <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80" alt="product" data-editable-img="fp3.image">
+        </div>
+        <div class="pp-info">
+          <div class="pp-cat" data-i18n="fp3.cat">包装材料</div>
+          <h3 data-editable="fp3.name" data-i18n="fp3.name">环保包装解决方案</h3>
+          <p data-editable="fp3.desc" data-i18n="fp3.desc">可降解材料，符合国际环保标准，助力绿色贸易</p>
+        </div>
+      </div>
+    </div>
+    <div class="section-cta">
+      <a href="products.html" class="btn btn-primary" data-i18n="featured.more" data-btn-key="featured.more">查看全部产品</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-bg">
+    <img src="https://images.unsplash.com/photo-1568992688065-536aad8a12f6?w=1600&q=80" alt="cta" data-editable-img="cta.image">
+    <div class="cta-overlay"></div>
+  </div>
+  <div class="cta-content">
+    <h2 data-editable="cta.title" data-i18n="cta.title">准备好开始合作了吗？</h2>
+    <p data-editable="cta.desc" data-i18n="cta.desc">立即联系我们的专业团队，获取定制化贸易解决方案</p>
+    <a href="contact.html" class="btn btn-gold" data-editable="cta.btn" data-i18n="cta.btn" data-btn-key="cta.btn">免费咨询</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <img src="" alt="Logo" class="logo-img" id="footerLogoImg" style="display:none;height:36px;width:auto;object-fit:contain">
+        <span class="logo-icon" id="footerLogoIcon">⬡</span>
+        <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+      </div>
+      <p class="footer-tagline" data-editable="footer.tagline" data-i18n="footer.tagline">连接全球，共创价值</p>
+    </div>
+    <div class="footer-links">
+      <h4 data-i18n="footer.nav">快速导航</h4>
+      <a href="index.html" data-i18n="nav.home">首页</a>
+      <a href="products.html" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+    </div>
+    <div class="footer-contact">
+      <h4 data-i18n="footer.contact">联系方式</h4>
+      <p data-editable="footer.email">✉ info@globaltrade.com</p>
+      <p data-editable="footer.phone">📞 +86 400-888-8888</p>
+      <p data-editable="footer.address" data-i18n="footer.address">📍 上海市浦东新区贸易大厦18楼</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-editable="footer.copy" data-i18n="footer.copy">© 2024 GlobalTrade Co. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script src="js/btn-actions.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script src="js/sidebar-editor.js"></script>
+</body>
+</html>

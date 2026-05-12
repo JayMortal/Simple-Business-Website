@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="about.pageTitle">关于我们 | GlobalTrade Co.</title>
+  <link rel="icon" id="siteFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="logo" id="logoLink">
+      <img src="" alt="Logo" class="logo-img" id="logoImg" style="display:none;height:40px;width:auto;object-fit:contain">
+      <span class="logo-icon" id="logoIconDefault">⬡</span>
+      <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link" data-i18n="nav.home">首页</a>
+      <a href="products.html" class="nav-link" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" class="nav-link active" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" class="nav-link" data-i18n="nav.contact">联系我们</a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+        <span class="lang-zh">中文</span>
+        <span class="lang-divider">|</span>
+        <span class="lang-en">EN</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" data-i18n="nav.home">首页</a>
+    <a href="products.html" data-i18n="nav.products">产品介绍</a>
+    <a href="about.html" data-i18n="nav.about">关于我们</a>
+    <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80" alt="about hero" data-editable-img="about.hero">
+    <div class="page-hero-overlay"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="index.html" data-i18n="nav.home">首页</a> / <span data-i18n="nav.about">关于我们</span></div>
+    <h1 data-i18n="about.heroTitle">关于我们</h1>
+    <p data-i18n="about.heroSub">二十年匠心，铸就全球贸易新标杆</p>
+  </div>
+</section>
+
+<!-- ABOUT STORY -->
+<section class="section about-story">
+  <div class="container">
+    <div class="about-story-grid">
+      <div class="about-story-img">
+        <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80" alt="our story" data-editable-img="about.story">
+        <div class="img-badge">
+          <span class="badge-num" data-editable="about.years">20</span>
+          <span class="badge-label" data-i18n="about.yearsLabel">年专业经验</span>
+        </div>
+      </div>
+      <div class="about-story-text">
+        <div class="section-tag" data-i18n="about.storyTag">我们的故事</div>
+        <h2 data-editable="about.storyTitle" data-i18n="about.storyTitle">从一粒种子到参天大树</h2>
+        <p data-editable="about.storyP1" data-i18n="about.storyP1">GlobalTrade Co. 成立于2004年，总部位于上海。二十年来，我们始终坚守"诚信、专业、创新"的核心价值观，从一家小型贸易公司成长为覆盖全球80余个国家和地区的综合性贸易集团。</p>
+        <p data-editable="about.storyP2" data-i18n="about.storyP2">我们拥有超过500名专业贸易团队成员，在亚洲、欧洲、北美及中东设有区域办公室，为全球5000余家合作伙伴提供稳定、高效的供应链解决方案。</p>
+        <p data-editable="about.storyP3" data-i18n="about.storyP3">面向未来，我们将持续深化数字化贸易能力，以技术赋能贸易，为全球客户创造更大价值。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION & VALUES -->
+<section class="section mission-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" data-i18n="about.missionTag">使命与价值观</div>
+      <h2 data-editable="about.missionTitle" data-i18n="about.missionTitle">驱动我们前行的力量</h2>
+    </div>
+    <div class="mission-grid">
+      <div class="mission-card mc-vision">
+        <div class="mc-icon">🎯</div>
+        <h3 data-i18n="about.vision">愿景</h3>
+        <p data-editable="about.visionText" data-i18n="about.visionText">成为最受信赖的全球贸易伙伴，让世界贸易更简单、更高效</p>
+      </div>
+      <div class="mission-card mc-mission">
+        <div class="mc-icon">🚀</div>
+        <h3 data-i18n="about.mission">使命</h3>
+        <p data-editable="about.missionText" data-i18n="about.missionText">通过专业服务和创新解决方案，连接全球供需，创造共同价值</p>
+      </div>
+      <div class="mission-card mc-values">
+        <div class="mc-icon">💎</div>
+        <h3 data-i18n="about.values">价值观</h3>
+        <p data-editable="about.valuesText" data-i18n="about.valuesText">诚信为本 · 专业精进 · 创新驱动 · 共赢发展</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="section team-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" data-i18n="about.teamTag">核心团队</div>
+      <h2 data-editable="about.teamTitle" data-i18n="about.teamTitle">专业团队，卓越服务</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-img">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80" alt="CEO" data-editable-img="team1.photo">
+        </div>
+        <h3 data-editable="team1.name" data-i18n="team1.name">张明远</h3>
+        <div class="team-role" data-editable="team1.role" data-i18n="team1.role">创始人 & CEO</div>
+        <p data-editable="team1.bio" data-i18n="team1.bio">20年国际贸易经验，前500强企业高管，主导公司全球战略布局</p>
+      </div>
+      <div class="team-card">
+        <div class="team-img">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80" alt="COO" data-editable-img="team2.photo">
+        </div>
+        <h3 data-editable="team2.name" data-i18n="team2.name">李雪婷</h3>
+        <div class="team-role" data-editable="team2.role" data-i18n="team2.role">首席运营官 COO</div>
+        <p data-editable="team2.bio" data-i18n="team2.bio">供应链管理专家，主导公司运营体系优化，推动数字化转型</p>
+      </div>
+      <div class="team-card">
+        <div class="team-img">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80" alt="CTO" data-editable-img="team3.photo">
+        </div>
+        <h3 data-editable="team3.name" data-i18n="team3.name">王志远</h3>
+        <div class="team-role" data-editable="team3.role" data-i18n="team3.role">技术总监 CTO</div>
+        <p data-editable="team3.bio" data-i18n="team3.bio">资深技术专家，带领技术团队打造智慧贸易平台，赋能业务增长</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section class="section cert-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" data-i18n="about.certTag">荣誉资质</div>
+      <h2 data-editable="about.certTitle" data-i18n="about.certTitle">专业认证，值得信赖</h2>
+    </div>
+    <div class="cert-grid">
+      <div class="cert-item">
+        <div class="cert-icon">🏆</div>
+        <p data-editable="cert1" data-i18n="cert1">ISO 9001:2015 质量管理体系认证</p>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">🌿</div>
+        <p data-editable="cert2" data-i18n="cert2">ISO 14001 环境管理体系认证</p>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">⭐</div>
+        <p data-editable="cert3" data-i18n="cert3">海关AEO高级认证企业</p>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">🛡️</div>
+        <p data-editable="cert4" data-i18n="cert4">中国对外贸易质量奖</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <img src="" alt="Logo" class="logo-img" id="footerLogoImg" style="display:none;height:36px;width:auto;object-fit:contain">
+        <span class="logo-icon" id="footerLogoIcon">⬡</span>
+        <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+      </div>
+      <p class="footer-tagline" data-editable="footer.tagline" data-i18n="footer.tagline">连接全球，共创价值</p>
+    </div>
+    <div class="footer-links">
+      <h4 data-i18n="footer.nav">快速导航</h4>
+      <a href="index.html" data-i18n="nav.home">首页</a>
+      <a href="products.html" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+    </div>
+    <div class="footer-contact">
+      <h4 data-i18n="footer.contact">联系方式</h4>
+      <p data-editable="footer.email">✉ info@globaltrade.com</p>
+      <p data-editable="footer.phone">📞 +86 400-888-8888</p>
+      <p data-editable="footer.address" data-i18n="footer.address">📍 上海市浦东新区贸易大厦18楼</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-editable="footer.copy" data-i18n="footer.copy">© 2024 GlobalTrade Co. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script src="js/btn-actions.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script src="js/sidebar-editor.js"></script>
+</body>
+</html>

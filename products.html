@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="products.pageTitle">产品介绍 | GlobalTrade Co.</title>
+  <link rel="icon" id="siteFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="logo" id="logoLink">
+      <img src="" alt="Logo" class="logo-img" id="logoImg" style="display:none;height:40px;width:auto;object-fit:contain">
+      <span class="logo-icon" id="logoIconDefault">⬡</span>
+      <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link" data-i18n="nav.home">首页</a>
+      <a href="products.html" class="nav-link active" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" class="nav-link" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" class="nav-link" data-i18n="nav.contact">联系我们</a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+        <span class="lang-zh">中文</span><span class="lang-divider">|</span><span class="lang-en">EN</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" data-i18n="nav.home">首页</a>
+    <a href="products.html" data-i18n="nav.products">产品介绍</a>
+    <a href="about.html" data-i18n="nav.about">关于我们</a>
+    <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <img src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=1600&q=80" alt="products hero" data-editable-img="products.hero" id="productsHeroImg">
+    <div class="page-hero-overlay"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="index.html" data-i18n="nav.home">首页</a> / <span data-i18n="nav.products">产品介绍</span></div>
+    <h1 data-editable="products.heroTitle" data-i18n="products.heroTitle">我们的产品</h1>
+    <p data-editable="products.heroSub" data-i18n="products.heroSub">专业产品线，满足全球市场需求</p>
+  </div>
+</section>
+
+<section class="section products-main">
+  <div class="container">
+    <div class="products-admin-bar admin-only" style="margin-bottom:32px">
+      <button class="btn btn-primary" onclick="addCategory()">＋ <span data-i18n="admin.addCat">添加分类</span></button>
+    </div>
+    <!-- All categories rendered vertically by JS -->
+    <div id="allCategoriesContent"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <img src="" alt="Logo" class="logo-img footer-logo-img" id="footerLogoImg" style="display:none;height:36px;width:auto;object-fit:contain">
+        <span class="logo-icon footer-logo-icon" id="footerLogoIcon">⬡</span>
+        <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+      </div>
+      <p class="footer-tagline" data-editable="footer.tagline" data-i18n="footer.tagline">连接全球，共创价值</p>
+    </div>
+    <div class="footer-links">
+      <h4 data-i18n="footer.nav">快速导航</h4>
+      <a href="index.html" data-i18n="nav.home">首页</a>
+      <a href="products.html" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+    </div>
+    <div class="footer-contact">
+      <h4 data-i18n="footer.contact">联系方式</h4>
+      <p data-editable="footer.email">✉ info@globaltrade.com</p>
+      <p data-editable="footer.phone">📞 +86 400-888-8888</p>
+      <p data-editable="footer.address" data-i18n="footer.address">📍 上海市浦东新区贸易大厦18楼</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-editable="footer.copy" data-i18n="footer.copy">© 2024 GlobalTrade Co. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script src="js/btn-actions.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/products-data.js"></script>
+<script src="js/products.js"></script>
+<script src="js/main.js"></script>
+<script src="js/sidebar-editor.js"></script>
+</body>
+</html>

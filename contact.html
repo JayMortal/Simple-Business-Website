@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="contact.pageTitle">联系我们 | GlobalTrade Co.</title>
+  <link rel="icon" id="siteFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="logo" id="logoLink">
+      <img src="" alt="Logo" class="logo-img" id="logoImg" style="display:none;height:40px;width:auto;object-fit:contain">
+      <span class="logo-icon" id="logoIconDefault">⬡</span>
+      <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link" data-i18n="nav.home">首页</a>
+      <a href="products.html" class="nav-link" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" class="nav-link" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" class="nav-link active" data-i18n="nav.contact">联系我们</a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+        <span class="lang-zh">中文</span>
+        <span class="lang-divider">|</span>
+        <span class="lang-en">EN</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" data-i18n="nav.home">首页</a>
+    <a href="products.html" data-i18n="nav.products">产品介绍</a>
+    <a href="about.html" data-i18n="nav.about">关于我们</a>
+    <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <img src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1600&q=80" alt="contact hero" data-editable-img="contact.hero">
+    <div class="page-hero-overlay"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="index.html" data-i18n="nav.home">首页</a> / <span data-i18n="nav.contact">联系我们</span></div>
+    <h1 data-i18n="contact.heroTitle">联系我们</h1>
+    <p data-i18n="contact.heroSub">我们期待与您的每一次合作</p>
+  </div>
+</section>
+
+<!-- CONTACT MAIN -->
+<section class="section contact-section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Info -->
+      <div class="contact-info">
+        <h2 data-editable="contact.infoTitle" data-i18n="contact.infoTitle">与我们取得联系</h2>
+        <p data-editable="contact.infoDesc" data-i18n="contact.infoDesc">无论您是寻找优质产品、了解合作方式，还是需要定制化解决方案，我们的专业团队随时准备为您服务。</p>
+
+        <div class="contact-items">
+          <div class="contact-item">
+            <div class="ci-icon">📍</div>
+            <div>
+              <div class="ci-label" data-i18n="contact.address">公司地址</div>
+              <div class="ci-value" data-editable="contact.addressVal" data-i18n="contact.addressVal">上海市浦东新区张江高科技园区贸易大厦18楼</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon">📞</div>
+            <div>
+              <div class="ci-label" data-i18n="contact.phone">联系电话</div>
+              <div class="ci-value" data-editable="contact.phoneVal">+86 400-888-8888</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon">✉</div>
+            <div>
+              <div class="ci-label" data-i18n="contact.email">电子邮件</div>
+              <div class="ci-value" data-editable="contact.emailVal">info@globaltrade.com</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon">🕐</div>
+            <div>
+              <div class="ci-label" data-i18n="contact.hours">工作时间</div>
+              <div class="ci-value" data-editable="contact.hoursVal" data-i18n="contact.hoursVal">周一至周五 9:00 - 18:00 (UTC+8)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-links">
+          <a href="#" class="social-btn" data-editable="social.wechat" data-btn-key="social.wechat">WeChat</a>
+          <a href="#" class="social-btn" data-editable="social.linkedin" data-btn-key="social.linkedin">LinkedIn</a>
+          <a href="#" class="social-btn" data-editable="social.whatsapp" data-btn-key="social.whatsapp">WhatsApp</a>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="contact-form-wrap">
+        <h2 data-i18n="contact.formTitle">发送询盘</h2>
+        <div class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="contact.name">姓名 *</label>
+              <input type="text" placeholder="您的姓名" data-i18n-placeholder="contact.namePlh">
+            </div>
+            <div class="form-group">
+              <label data-i18n="contact.company">公司名称</label>
+              <input type="text" placeholder="您的公司" data-i18n-placeholder="contact.companyPlh">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="contact.emailLabel">电子邮件 *</label>
+              <input type="email" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+              <label data-i18n="contact.phoneLabel">电话号码</label>
+              <input type="tel" placeholder="+86 ...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="contact.subject">询盘主题 *</label>
+            <input type="text" placeholder="请输入主题" data-i18n-placeholder="contact.subjectPlh">
+          </div>
+          <div class="form-group">
+            <label data-i18n="contact.message">询盘内容 *</label>
+            <textarea rows="5" placeholder="请描述您的需求..." data-i18n-placeholder="contact.messagePlh"></textarea>
+          </div>
+          <button class="btn btn-primary btn-full" id="contactSubmitBtn" data-editable="contact.submitBtn" data-i18n="contact.submitBtn" data-btn-key="contact.submitBtn" onclick="handleBtnClick('contact.submitBtn',event)">发送询盘</button>
+          <p class="form-note" data-i18n="contact.formNote">* 我们通常在1个工作日内回复</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MAP PLACEHOLDER -->
+<div class="map-section">
+  <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1600&q=80" alt="map" class="map-img" data-editable-img="contact.map">
+  <div class="map-overlay">
+    <div class="map-pin">📍 GlobalTrade Co.</div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <img src="" alt="Logo" class="logo-img" id="footerLogoImg" style="display:none;height:36px;width:auto;object-fit:contain">
+        <span class="logo-icon" id="footerLogoIcon">⬡</span>
+        <span class="logo-text" data-editable="logo.text">GlobalTrade Co.</span>
+      </div>
+      <p class="footer-tagline" data-editable="footer.tagline" data-i18n="footer.tagline">连接全球，共创价值</p>
+    </div>
+    <div class="footer-links">
+      <h4 data-i18n="footer.nav">快速导航</h4>
+      <a href="index.html" data-i18n="nav.home">首页</a>
+      <a href="products.html" data-i18n="nav.products">产品介绍</a>
+      <a href="about.html" data-i18n="nav.about">关于我们</a>
+      <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+    </div>
+    <div class="footer-contact">
+      <h4 data-i18n="footer.contact">联系方式</h4>
+      <p data-editable="footer.email">✉ info@globaltrade.com</p>
+      <p data-editable="footer.phone">📞 +86 400-888-8888</p>
+      <p data-editable="footer.address" data-i18n="footer.address">📍 上海市浦东新区贸易大厦18楼</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-editable="footer.copy" data-i18n="footer.copy">© 2024 GlobalTrade Co. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script src="js/btn-actions.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script src="js/sidebar-editor.js"></script>
+<script>
+function submitForm() {
+  alert(window.currentLang === 'en' ? 'Message sent! We will reply within 1 business day.' : '询盘已发送！我们将在1个工作日内回复您。');
+}
+</script>
+</body>
+</html>
