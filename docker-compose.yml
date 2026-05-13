@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   web:
     build: .
@@ -35,9 +37,9 @@ services:
 #   docker compose down
 #
 # ── Panel integration (1Panel / aaPanel / BT Panel) ───────────────
-# 1. Deploy this container on port 8080 (or any unused port).
+# 1. Deploy this container on port 14514 (or any unused port).
 # 2. In your panel, create a "Reverse Proxy" website:
 #      Domain:        yourdomain.com
-#      Proxy target:  http://127.0.0.1:8080
+#      Proxy target:  http://127.0.0.1:14514
 # 3. Apply SSL via the panel's built-in Let's Encrypt button.
 #    The container itself does not need to handle HTTPS.

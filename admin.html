@@ -40,6 +40,25 @@
       <div><div class="sidebar-title">GlobalTrade</div><div class="sidebar-sub">Admin Panel</div></div>
     </div>
 
+    <!-- Edit Language Switcher (which language content is being edited) -->
+    <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.15)">
+      <div style="font-size:.72rem;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px" id="editLangLabel">编辑语言</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button onclick="switchEditLang('zh')" id="editLangZh"
+          style="flex:1;padding:7px 8px;border-radius:6px;border:1.5px solid #c9a84c;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;background:#c9a84c;color:#0a1628;transition:.2s">
+          🇨🇳 中文
+        </button>
+        <button onclick="switchEditLang('en')" id="editLangEn"
+          style="flex:1;padding:7px 8px;border-radius:6px;border:1.5px solid #444;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;background:transparent;color:#888;transition:.2s">
+          🇬🇧 English
+        </button>
+      </div>
+      <div id="editLangIndicator" style="font-size:.75rem;padding:5px 10px;border-radius:4px;text-align:center;background:#fff3d0;color:#8b6914;font-weight:600">
+        正在编辑：中文内容
+      </div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.4" id="editLangHint">右侧编辑的是该语言的前台内容</div>
+    </div>
+
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">页面内容</div>
       <a href="#" class="sidebar-link active" onclick="switchPage('home')">🏠 首页</a>
@@ -55,7 +74,7 @@
 
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="doLogout()">退出登录</button>
-      <div class="sidebar-version">v2.0.0 · 安全版</div>
+      <div class="sidebar-version">v5.0.0 · 双语版</div>
     </div>
   </aside>
 
@@ -64,9 +83,9 @@
     <div class="admin-topbar">
       <div class="admin-breadcrumb" id="adminBreadcrumb">管理后台 / 首页管理</div>
       <div class="admin-actions" style="display:flex;align-items:center;gap:10px">
-        <!-- Admin language toggle -->
+        <!-- Admin UI language toggle -->
         <div style="display:flex;align-items:center;gap:6px;background:#f0f2f5;border-radius:20px;padding:4px 12px">
-          <span style="font-size:.75rem;color:#888">界面语言</span>
+          <span style="font-size:.75rem;color:#888" id="uiLangLabel">界面语言</span>
           <button onclick="switchAdminLang('zh')" id="adminLangZh" style="padding:3px 10px;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-family:inherit;background:#0a1628;color:#fff">中文</button>
           <button onclick="switchAdminLang('en')" id="adminLangEn" style="padding:3px 10px;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-family:inherit;background:transparent;color:#666">EN</button>
         </div>
@@ -310,6 +329,42 @@
     <div class="admin-content" id="page-settings" style="display:none">
       <h2 class="admin-page-title">网站全局设置</h2>
 
+      <!-- Site Default Language — most important setting, shown first -->
+      <div class="admin-card" style="border:2px solid #c9a84c">
+        <h3 style="color:#0a1628">🌐 网站默认语言 <small style="color:#aaa;font-weight:normal;font-size:.8rem">（访客第一次打开网站时显示的语言）</small></h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px">
+          此设置决定<strong>陌生访客</strong>第一次打开网站看到的语言。访客主动切换语言后，下次打开会保持他自己的选择。
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-auto">
+            <input type="radio" name="siteDefaultLang" id="siteDefaultLang" value="auto" checked onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
+            <div style="font-size:1.5rem">🌍</div>
+            <div>
+              <div style="font-weight:700;color:#0a1628">自动识别（推荐）</div>
+              <div style="font-size:.78rem;color:#888">根据访客浏览器语言自动判断<br>中文浏览器→中文，其他→英文</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-zh">
+            <input type="radio" name="siteDefaultLang" value="zh" onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
+            <div style="font-size:1.5rem">🇨🇳</div>
+            <div>
+              <div style="font-weight:700;color:#0a1628">默认中文</div>
+              <div style="font-size:.78rem;color:#888">所有访客首次打开显示中文<br>适合主要面向中文市场的网站</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-en">
+            <input type="radio" name="siteDefaultLang" value="en" onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
+            <div style="font-size:1.5rem">🇬🇧</div>
+            <div>
+              <div style="font-weight:700;color:#0a1628">默认英文</div>
+              <div style="font-size:.78rem;color:#888">所有访客首次打开显示英文<br>适合主要面向英文市场的网站</div>
+            </div>
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="saveSiteDefaultLang()">保存语言设置</button>
+        <p style="color:#aaa;font-size:.78rem;margin-top:10px">💡 建议：外贸网站通常选「自动识别」——中国客户看中文，海外客户看英文，双方体验最佳。</p>
+      </div>
+
       <div class="admin-card">
         <h3>品牌 Logo</h3>
         <p style="color:#888;font-size:.85rem;margin-bottom:16px">Logo 图片和标题文字二选一：上传图片后将隐藏文字 Logo。<br>浏览器标签页 Favicon 为独立设置，可使用不同图片。</p>
@@ -457,6 +512,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const ah = document.getElementById('themeColorAccentHex');
   if (pc && ph) { ph.value = pc.value; pc.addEventListener('input', () => { ph.value = pc.value; applyThemePreview(); }); }
   if (ac && ah) { ah.value = ac.value; ac.addEventListener('input', () => { ah.value = ac.value; applyThemePreview(); }); }
+
+  // Site default language radio card UI
+  const radios = document.querySelectorAll('input[name="siteDefaultLang"]');
+  const cards  = { auto: document.getElementById('lbl-auto'), zh: document.getElementById('lbl-zh'), en: document.getElementById('lbl-en') };
+  function updateLangCards(val) {
+    Object.entries(cards).forEach(([k, el]) => {
+      if (!el) return;
+      el.style.borderColor = k === val ? '#c9a84c' : '#ddd';
+      el.style.background  = k === val ? '#fffbf0' : '#fff';
+    });
+    // Sync hidden select for saveSiteDefaultLang()
+    const sel = document.getElementById('siteDefaultLang');
+    if (sel) sel.value = val;
+  }
+  radios.forEach(r => r.addEventListener('change', () => updateLangCards(r.value)));
+
+  // Init card state from localStorage
+  const saved = localStorage.getItem('site.defaultLang') || 'auto';
+  const matchRadio = document.querySelector(`input[name="siteDefaultLang"][value="${saved}"]`);
+  if (matchRadio) matchRadio.checked = true;
+  updateLangCards(saved);
+
+  // Override saveSiteDefaultLang to read from radio group
+  window.saveSiteDefaultLang = function() {
+    const checked = document.querySelector('input[name="siteDefaultLang"]:checked');
+    const val = checked ? checked.value : 'auto';
+    localStorage.setItem('site.defaultLang', val);
+    if (typeof syncAllToServer === 'function') {
+      syncAllToServer(
+        () => showAdminToast('✅ 网站默认语言已保存并同步', 'success'),
+        () => showAdminToast('已保存（服务器同步失败）', 'error')
+      );
+    }
+  };
 });
 
 function setThemePreset(primary, accent) {

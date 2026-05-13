@@ -1,4 +1,4 @@
-# Simple-Business-Websitebuilder — 外贸网站模板
+# GlobalTrade Co. — 外贸网站模板
 
 > 🌐 **中文** | [English](README.md)
 
@@ -9,7 +9,7 @@
 ## 📁 项目结构
 
 ```
-Simple-Business-Websitebuilder/
+trade-website/
 ├── index.html            # 首页
 ├── products.html         # 产品介绍页（所有分类垂直展开）
 ├── about.html            # 关于我们
@@ -64,20 +64,20 @@ Simple-Business-Websitebuilder/
 
 **方式一：从 GitHub 克隆（推荐）**
 ```bash
-git clone https://github.com/你的用户名/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
-cd /root/Simple-Business-Websitebuilder
+git clone https://github.com/你的用户名/trade-website.git /root/trade-website
+cd /root/trade-website
 ```
 
 **方式二：通过 SCP 从本地上传**
 ```bash
 # 在本地机器上执行
-scp -r ./Simple-Business-Websitebuilder root@你的服务器IP:/root/
+scp -r ./trade-website root@你的服务器IP:/root/
 ```
 
 ### 第二步 — 运行部署脚本
 
 ```bash
-cd /root/Simple-Business-Websitebuilder
+cd /root/trade-website
 chmod +x deploy.sh
 
 # 仅 HTTP
@@ -122,8 +122,8 @@ apt-get install -y docker-compose-plugin
 ### 第一步 — 获取代码
 
 ```bash
-git clone https://github.com/你的用户名/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
-cd /root/Simple-Business-Websitebuilder
+git clone https://github.com/你的用户名/trade-website.git /root/trade-website
+cd /root/trade-website
 ```
 
 ### 第二步 — 初始化数据目录
@@ -315,13 +315,13 @@ git push
 
 # 服务器：拉取并同步
 ssh root@你的服务器IP
-cd /root/Simple-Business-Websitebuilder
+cd /root/trade-website
 git pull
 cp -r *.html css js /var/www/globaltrade/
 systemctl reload nginx
 ```
 
-> **技巧：** 如果不想每次都手动执行 `cp`，可在运行 `deploy.sh` 之前将脚本中的 `SITE_DIR` 改为 `/root/Simple-Business-Websitebuilder`。这样 Nginx 直接从 Git 仓库目录提供文件，`git pull` 之后无需额外步骤，线上即时更新。
+> **技巧：** 如果不想每次都手动执行 `cp`，可在运行 `deploy.sh` 之前将脚本中的 `SITE_DIR` 改为 `/root/trade-website`。这样 Nginx 直接从 Git 仓库目录提供文件，`git pull` 之后无需额外步骤，线上即时更新。
 
 ---
 
@@ -337,4 +337,4 @@ systemctl reload nginx
 
 ---
 
-*Built with ❤️ — [Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.1*
+*Built with ❤️ — GlobalTrade Website Template v3.0*

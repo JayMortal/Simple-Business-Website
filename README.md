@@ -1,4 +1,4 @@
-# Simple-Business-Websitebuilder
+# GlobalTrade Co. — International Trade Website Template
 
 > 🌐 [中文文档](README_CN.md) | **English**
 
@@ -9,7 +9,7 @@ A fully-featured B2B trade website template with bilingual support (Chinese / En
 ## 📁 Project Structure
 
 ```
-Simple-Business-Websitebuilder/
+trade-website/
 ├── index.html            # Home page
 ├── products.html         # Products page (all categories shown vertically)
 ├── about.html            # About Us page
@@ -64,19 +64,19 @@ Simple-Business-Websitebuilder/
 
 **Option A: Clone from GitHub (recommended)**
 ```bash
-git clone https://github.com/your-username/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
-cd /root/Simple-Business-Websitebuilder
+git clone https://github.com/your-username/trade-website.git /root/trade-website
+cd /root/trade-website
 ```
 
 **Option B: Upload via SCP from your local machine**
 ```bash
-scp -r ./Simple-Business-Websitebuilder root@your-server-ip:/root/
+scp -r ./trade-website root@your-server-ip:/root/
 ```
 
 ### Step 2 — Run the Deploy Script
 
 ```bash
-cd /root/Simple-Business-Websitebuilder
+cd /root/trade-website
 chmod +x deploy.sh
 
 # HTTP only
@@ -121,8 +121,8 @@ apt-get install -y docker-compose-plugin
 ### Step 1 — Get the Code
 
 ```bash
-git clone https://github.com/your-username/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
-cd /root/Simple-Business-Websitebuilder
+git clone https://github.com/your-username/trade-website.git /root/trade-website
+cd /root/trade-website
 ```
 
 ### Step 2 — Initialise Data Directory
@@ -306,13 +306,13 @@ git push
 
 # VPS — pull and sync
 ssh root@your-server-ip
-cd /root/Simple-Business-Websitebuilder
+cd /root/trade-website
 git pull
 cp -r *.html css js /var/www/globaltrade/
 systemctl reload nginx
 ```
 
-> **Tip:** To skip the manual `cp` step on every update, change `SITE_DIR` in `deploy.sh` to `/root/Simple-Business-Websitebuilder` before running it. Nginx will then serve files directly from the Git repository directory, so `git pull` alone is enough to update the live site.
+> **Tip:** To skip the manual `cp` step on every update, change `SITE_DIR` in `deploy.sh` to `/root/trade-website` before running it. Nginx will then serve files directly from the Git repository directory, so `git pull` alone is enough to update the live site.
 
 ---
 
@@ -328,4 +328,4 @@ systemctl reload nginx
 
 ---
 
-*Built with ❤️ — [Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.1*
+*Built with ❤️ — GlobalTrade Website Template v3.0*

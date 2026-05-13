@@ -212,8 +212,9 @@ window.sbApplyUrl = function(key) {
   const url = input.value;
   const prev = document.getElementById('sbprev_' + key.replace(/\./g,'_'));
   if (prev) prev.src = url;
-  // Live apply to page
   document.querySelectorAll(`[data-editable-img="${key}"]`).forEach(el => el.src = url);
+  const imgStoreKey = (key === 'logo.image' || key === 'site.favicon') ? 'edit_img_' + key : window.editImgKey(window.currentLang || 'zh', key);
+  localStorage.setItem(imgStoreKey, url);
   if (key === 'logo.image') applyLogoImg?.();
 };
 
@@ -245,22 +246,35 @@ window.sidebarSwitchLang = function(lang) {
 window.sidebarSave = function() {
   if (!confirm('确定保存所有更改吗？\n\n保存后内容将立即生效。')) return;
 
-  // Save text fields
+  // Save text fields with lang-prefixed keys
   document.querySelectorAll('#sidebarFields [data-sbkey]').forEach(input => {
-    const key = input.getAttribute('data-sbkey');
+    const key  = input.getAttribute('data-sbkey');
     const type = input.getAttribute('data-type');
-    const val = input.value !== undefined ? input.value : input.textContent;
+    const val  = input.value !== undefined ? input.value : input.textContent;
+    const lang = window.currentLang || 'zh';
     if (type === 'img') {
-      localStorage.setItem('edit_img_' + key, val);
+      const imgStoreKey = (key === 'logo.image' || key === 'site.favicon')
+        ? 'edit_img_' + key
+        : (window.editImgKey ? window.editImgKey(lang, key) : 'edit_img_' + key);
+      localStorage.setItem(imgStoreKey, val);
       document.querySelectorAll(`[data-editable-img="${key}"]`).forEach(el => el.src = val);
     } else {
-      localStorage.setItem('edit_' + key, val);
+      const storeKey = window.editKey ? window.editKey(lang, key) : 'edit_' + key;
+      localStorage.setItem(storeKey, val);
       document.querySelectorAll(`[data-editable="${key}"]`).forEach(el => el.textContent = val);
     }
   });
 
   closeSidebar();
-  showSiteToast('✅ 页面内容已保存！');
+  // Sync to server after saving
+  if (window.syncToServer) {
+    window.syncToServer(
+      () => showSiteToast('✅ 页面内容已保存并同步！'),
+      () => showSiteToast('✅ 已保存（服务器同步失败）')
+    );
+  } else {
+    showSiteToast('✅ 页面内容已保存！');
+  }
 };
 
 window.sidebarCancel = function() {
