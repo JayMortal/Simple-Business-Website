@@ -16,7 +16,8 @@ window.BTN_REGISTRY = [
   { key: 'contact.submitBtn', label: '联系页「发送询盘」按钮',    defaultType: 'email', defaultTarget: ''              },
 ];
 
-const PAGES = [
+// NOTE: must be window.PAGES (not const) so admin.js can read it cross-script
+window.PAGES = [
   { value: 'index.html',    label: '首页 (index.html)'     },
   { value: 'products.html', label: '产品介绍 (products.html)' },
   { value: 'about.html',    label: '关于我们 (about.html)'  },

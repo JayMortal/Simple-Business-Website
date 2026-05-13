@@ -1,39 +1,58 @@
-# Simple Business Website — 轻量外贸网站模板
+# Simple-Business-Websitebuilder — 外贸网站模板
 
 > 🌐 **中文** | [English](README.md)
 
-一个功能完整的外贸企业网站模板，支持中英双语、可视化后台管理、实时侧边栏编辑器、一键部署到 Linux VPS，无需任何后端服务。
+一个功能完整的外贸企业网站模板，支持中英双语、可视化后台管理、实时侧边栏编辑器、一键部署到 Linux VPS。后台修改通过轻量 PHP 接口持久化到服务器，所有访客可见，无需数据库。
 
 ---
 
 ## 📁 项目结构
 
 ```
-trade-website/
+Simple-Business-Websitebuilder/
 ├── index.html            # 首页
 ├── products.html         # 产品介绍页（所有分类垂直展开）
 ├── about.html            # 关于我们
 ├── contact.html          # 联系我们
 ├── admin.html            # 管理后台（通过 /admin.html 访问）
+├── api.php               # ★ 后端接口：持久化存储，Session令牌验证
 ├── css/
 │   ├── style.css         # 主样式表 + CSS 主题变量
 │   └── admin.css         # 管理后台样式
 ├── js/
 │   ├── i18n.js           # 中英文切换
-│   ├── main.js           # 核心逻辑、编辑模式、Logo/Favicon、主题色
+│   ├── main.js           # 核心逻辑、编辑模式、Logo/Favicon、主题色、服务器同步
 │   ├── btn-actions.js    # 按钮动作管理（跳转页面 / 发邮件 / 外部链接）
 │   ├── sidebar-editor.js # 实时侧边栏编辑器
-│   ├── products-data.js  # 产品数据存储（localStorage）
+│   ├── products-data.js  # 产品数据存储
 │   ├── products.js       # 产品页渲染与管理
 │   └── admin.js          # 管理后台逻辑
-├── deploy.sh             # 一键部署脚本
+├── Dockerfile            # Docker 镜像构建文件
+├── docker-compose.yml    # Docker Compose 启动配置
+├── deploy.sh             # 裸机一键部署脚本（Nginx）
 ├── README.md             # 英文文档
 └── README_CN.md          # 本文件（中文）
 ```
 
 ---
 
-## 🚀 一键部署到 VPS
+## 🔑 数据持久化原理
+
+`api.php` 是本项目的核心后端，约 120 行 PHP，无需数据库：
+
+| 请求 | 作用 |
+|------|------|
+| GET `api.php` | 返回 `site-data.json`（前台页面加载时读取） |
+| POST `login` | 验证 bcrypt 哈希密码，签发带过期时间的 Session 令牌 |
+| POST `save` | 携带有效令牌，将全站数据写入 `site-data.json` |
+| POST `change_password` | 携带令牌，更新 bcrypt 密码哈希，令牌同时失效 |
+| POST `logout` | 服务器端使令牌失效 |
+
+**工作流**：管理员登录 → 服务器颁发令牌 → 每次保存自动携带令牌推送数据 → 普通访客打开网站时从 `api.php` 读取最新数据渲染页面。
+
+---
+
+## 🚀 方式一：裸机部署（Nginx + PHP-FPM）
 
 ### 前置条件
 
@@ -45,20 +64,20 @@ trade-website/
 
 **方式一：从 GitHub 克隆（推荐）**
 ```bash
-git clone https://github.com/你的用户名/trade-website.git /root/trade-website
-cd /root/trade-website
+git clone https://github.com/你的用户名/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
+cd /root/Simple-Business-Websitebuilder
 ```
 
 **方式二：通过 SCP 从本地上传**
 ```bash
 # 在本地机器上执行
-scp -r ./trade-website root@你的服务器IP:/root/
+scp -r ./Simple-Business-Websitebuilder root@你的服务器IP:/root/
 ```
 
 ### 第二步 — 运行部署脚本
 
 ```bash
-cd /root/trade-website
+cd /root/Simple-Business-Websitebuilder
 chmod +x deploy.sh
 
 # 仅 HTTP
@@ -69,9 +88,10 @@ bash deploy.sh yourdomain.com --ssl
 ```
 
 脚本将自动完成：
-- 安装 Nginx（如未安装）
+- 安装 Nginx + PHP-FPM（用于运行 `api.php`）
 - 将网站文件复制到 `/var/www/globaltrade/`
-- 生成并启用优化过的 Nginx 配置
+- 设置 `site-data.json` 和 `api-state.json` 的写入权限
+- 生成并启用优化过的 Nginx 配置（含 PHP 支持）
 - 开放防火墙 80 和 443 端口
 - 可选：申请并配置 SSL 证书
 
@@ -82,6 +102,73 @@ bash deploy.sh yourdomain.com --ssl
 | `http://yourdomain.com` | 公开网站 |
 | `http://yourdomain.com/admin.html` | 管理后台 |
 | 默认密码 | `admin123` — **首次登录后请立即修改** |
+
+---
+
+## 🐳 方式二：Docker 部署（推荐用于已安装 1Panel / aaPanel 等面板的 VPS）
+
+面板工具通常已占用 80/443 端口并自带 Nginx/OpenResty，与裸机脚本可能冲突。使用 Docker 可以完全隔离，通过面板的反向代理功能对外提供服务。
+
+### 前置条件
+
+```bash
+# 安装 Docker
+curl -fsSL https://get.docker.com | sh
+
+# 安装 Docker Compose
+apt-get install -y docker-compose-plugin
+```
+
+### 第一步 — 获取代码
+
+```bash
+git clone https://github.com/你的用户名/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
+cd /root/Simple-Business-Websitebuilder
+```
+
+### 第二步 — 初始化数据目录
+
+```bash
+mkdir -p data
+echo '{}' > data/site-data.json
+echo '{}' > data/api-state.json
+```
+
+### 第三步 — 启动容器
+
+```bash
+docker compose up -d --build
+```
+
+容器启动后监听 `14514` 端口（可在 `docker-compose.yml` 中修改）。
+
+### 第四步 — 面板配置反向代理
+
+以 **1Panel** 为例：
+1. 网站 → 新建网站 → 选择「反向代理」
+2. 域名填写你的域名，代理地址填 `http://127.0.0.1:14514`
+3. 在网站 SSL 设置中申请 Let's Encrypt 证书
+
+其他面板（aaPanel、宝塔）操作类似，创建反向代理站点，指向 `127.0.0.1:14514`。
+
+### 常用命令
+
+```bash
+# 查看运行状态
+docker compose ps
+
+# 查看日志
+docker compose logs -f
+
+# 停止
+docker compose down
+
+# 更新代码后重新部署（数据不丢失）
+git pull
+docker compose up -d --build
+```
+
+> **数据持久化说明**：`site-data.json`（网站内容）和 `api-state.json`（登录状态）通过 Docker Volume 映射到宿主机的 `./data/` 目录，容器重建或服务器重启后数据均不会丢失。
 
 ---
 
@@ -228,13 +315,13 @@ git push
 
 # 服务器：拉取并同步
 ssh root@你的服务器IP
-cd /root/trade-website
+cd /root/Simple-Business-Websitebuilder
 git pull
 cp -r *.html css js /var/www/globaltrade/
 systemctl reload nginx
 ```
 
-> **技巧：** 如果不想每次都手动执行 `cp`，可在运行 `deploy.sh` 之前将脚本中的 `SITE_DIR` 改为 `/root/trade-website`。这样 Nginx 直接从 Git 仓库目录提供文件，`git pull` 之后无需额外步骤，线上即时更新。
+> **技巧：** 如果不想每次都手动执行 `cp`，可在运行 `deploy.sh` 之前将脚本中的 `SITE_DIR` 改为 `/root/Simple-Business-Websitebuilder`。这样 Nginx 直接从 Git 仓库目录提供文件，`git pull` 之后无需额外步骤，线上即时更新。
 
 ---
 
@@ -250,4 +337,4 @@ systemctl reload nginx
 
 ---
 
-*Built with ❤️ — Simple Business Website*
+*Built with ❤️ — [Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.1*

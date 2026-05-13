@@ -1,5 +1,13 @@
-// ===== MAIN JS v2 =====
+// ===== MAIN JS v4 =====
+// Changes vs v3:
+//  - On DOMContentLoaded: fetch site-data.json from api.php, hydrate localStorage,
+//    then render. Falls back to localStorage-only if api.php not present.
+//  - saveFrontChanges() and applyImageEdit() call syncToServer() after saving locally.
+//  - syncToServer() posts full state to api.php with session token.
+//  - Token stored in sessionStorage (cleared when tab closes).
+
 const ADMIN_SESSION_KEY = 'adminLoggedIn';
+const API_TOKEN_KEY     = 'apiToken';   // sessionStorage
 
 // ── Header scroll
 const header = document.getElementById('siteHeader');
@@ -11,91 +19,138 @@ function toggleMobileMenu() {
   if (nav) nav.classList.toggle('open');
 }
 
-// ── Check admin
+// ── Admin / token helpers
 function isAdminMode() { return localStorage.getItem(ADMIN_SESSION_KEY) === '1'; }
+function getApiToken()  { return sessionStorage.getItem(API_TOKEN_KEY) || ''; }
 
-// ── Apply theme colors (CSS variables from stored values)
+// ── Theme colors
 function applyThemeColors() {
   const primary = localStorage.getItem('theme.primary');
-  const accent = localStorage.getItem('theme.accent');
-  if (primary) document.documentElement.style.setProperty('--navy', primary);
-  if (accent) document.documentElement.style.setProperty('--gold', accent);
-  // Derive lighter variants
+  const accent  = localStorage.getItem('theme.accent');
   if (primary) {
-    document.documentElement.style.setProperty('--navy-mid', hexToRgba(primary, 0.85));
+    document.documentElement.style.setProperty('--navy', primary);
+    document.documentElement.style.setProperty('--navy-mid',   hexToRgba(primary, 0.85));
     document.documentElement.style.setProperty('--navy-light', hexToRgba(primary, 0.65));
   }
   if (accent) {
+    document.documentElement.style.setProperty('--gold',       accent);
     document.documentElement.style.setProperty('--gold-light', lightenHex(accent, 20));
-    document.documentElement.style.setProperty('--gold-pale', lightenHex(accent, 70));
+    document.documentElement.style.setProperty('--gold-pale',  lightenHex(accent, 70));
   }
 }
-
 function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 function lightenHex(hex, amount) {
-  let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  r = Math.min(255, r + amount); g = Math.min(255, g + amount); b = Math.min(255, b + amount);
-  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  r=Math.min(255,r+amount); g=Math.min(255,g+amount); b=Math.min(255,b+amount);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-// ── Apply logo image
+// ── Logo / favicon
 function applyLogoImg() {
   const stored = localStorage.getItem('edit_img_logo.image');
-  const logoImgs = document.querySelectorAll('#logoImg, #footerLogoImg, .logo-img');
-  const logoIcons = document.querySelectorAll('#logoIconDefault, .footer-logo-icon, .logo-icon');
-  if (stored) {
-    logoImgs.forEach(img => { img.src = stored; img.style.display = 'block'; });
-    logoIcons.forEach(ic => ic.style.display = 'none');
-  } else {
-    logoImgs.forEach(img => img.style.display = 'none');
-    logoIcons.forEach(ic => ic.style.display = '');
+  document.querySelectorAll('#logoImg,#footerLogoImg,.logo-img').forEach(img => {
+    img.src = stored || ''; img.style.display = stored ? 'block' : 'none';
+  });
+  document.querySelectorAll('#logoIconDefault,.footer-logo-icon,.logo-icon').forEach(ic => {
+    ic.style.display = stored ? 'none' : '';
+  });
+}
+function applyFavicon() {
+  const stored = localStorage.getItem('edit_img_site.favicon');
+  const fav = document.getElementById('siteFavicon');
+  if (stored && fav) fav.href = stored;
+}
+
+// ── Hydrate localStorage from server data object
+function hydrateFromServerData(data) {
+  if (!data || data.status === 'empty') return;
+  if (data.editableContent)  Object.entries(data.editableContent).forEach(([k,v])  => localStorage.setItem('edit_'+k, v));
+  if (data.editableImages)   Object.entries(data.editableImages).forEach(([k,v])   => localStorage.setItem('edit_img_'+k, v));
+  if (data.btnActions)       Object.entries(data.btnActions).forEach(([k,v])        => localStorage.setItem('btn_action_'+k, v));
+  if (data.productsData)     localStorage.setItem('productsData', JSON.stringify(data.productsData));
+  if (data.themeColors) {
+    if (data.themeColors.primary) localStorage.setItem('theme.primary', data.themeColors.primary);
+    if (data.themeColors.accent)  localStorage.setItem('theme.accent',  data.themeColors.accent);
   }
 }
 
-// ── Apply favicon
-function applyFavicon() {
-  const stored = localStorage.getItem('edit_img_site.favicon');
-  const favicon = document.getElementById('siteFavicon');
-  if (stored && favicon) favicon.href = stored;
-}
-
-// ── Load stored editable content
+// ── Load from localStorage into DOM
 function loadEditableContent() {
   document.querySelectorAll('[data-editable]').forEach(el => {
-    const key = el.getAttribute('data-editable');
-    const stored = localStorage.getItem('edit_' + key);
-    if (stored) el.textContent = stored;
+    const v = localStorage.getItem('edit_' + el.getAttribute('data-editable'));
+    if (v) el.textContent = v;
   });
   document.querySelectorAll('[data-editable-img]').forEach(el => {
-    const key = el.getAttribute('data-editable-img');
-    const stored = localStorage.getItem('edit_img_' + key);
-    if (stored) el.src = stored;
+    const v = localStorage.getItem('edit_img_' + el.getAttribute('data-editable-img'));
+    if (v) el.src = v;
   });
   applyLogoImg();
   applyFavicon();
   applyThemeColors();
 }
 
-// ── Enable inline edit mode (contentEditable + image click)
+// ── Collect all current data from localStorage
+function collectAllData() {
+  const data = {
+    editableContent: {}, editableImages: {}, btnActions: {},
+    productsData: window.ProductsDB ? ProductsDB.load() : null,
+    themeColors: {
+      primary: localStorage.getItem('theme.primary'),
+      accent:  localStorage.getItem('theme.accent')
+    }
+  };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if      (k.startsWith('edit_img_'))  data.editableImages[k.replace('edit_img_','')]  = localStorage.getItem(k);
+    else if (k.startsWith('edit_'))      data.editableContent[k.replace('edit_','')]     = localStorage.getItem(k);
+    else if (k.startsWith('btn_action_'))data.btnActions[k.replace('btn_action_','')]    = localStorage.getItem(k);
+  }
+  return data;
+}
+
+// ── Push current state to server (silent, non-blocking)
+window.syncToServer = function(onSuccess, onError) {
+  const token = getApiToken();
+  if (!token) return; // not logged in as admin, skip
+  fetch('api.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'save', token, data: collectAllData() })
+  })
+  .then(r => r.json())
+  .then(resp => {
+    if (resp.status === 'ok') {
+      onSuccess && onSuccess();
+    } else if (resp.error === 'invalid_token') {
+      // Token expired — clear session, prompt re-login
+      sessionStorage.removeItem(API_TOKEN_KEY);
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      showSiteToast('⚠ 登录已过期，请重新登录后台');
+    } else {
+      onError && onError(resp.error);
+    }
+  })
+  .catch(() => { /* network error — silently skip */ });
+};
+
+// ── Edit mode
 function enableEditMode() {
   document.body.classList.add('admin-mode','edit-mode');
-
   document.querySelectorAll('[data-editable]').forEach(el => {
     el.contentEditable = 'true';
     el.addEventListener('blur', () => {
       localStorage.setItem('edit_' + el.getAttribute('data-editable'), el.textContent);
     });
   });
-
   document.querySelectorAll('[data-editable-img]').forEach(el => {
     el.addEventListener('click', () => showImageEditor(el.getAttribute('data-editable-img'), el));
   });
 }
 
-// ── Image replacement dialog
+// ── Image editor dialog
 function showImageEditor(key, triggerEl) {
   const cur = localStorage.getItem('edit_img_' + key) || triggerEl?.src || '';
   const overlay = document.createElement('div');
@@ -123,13 +178,14 @@ function applyImageEdit(key) {
   const url = document.getElementById('imgEditorUrl').value || document.getElementById('imgEditorPrev').src;
   localStorage.setItem('edit_img_' + key, url);
   document.querySelectorAll(`[data-editable-img="${key}"]`).forEach(el => el.src = url);
-  if (key === 'logo.image') applyLogoImg();
-  if (key === 'site.favicon') applyFavicon();
+  if (key === 'logo.image')    applyLogoImg();
+  if (key === 'site.favicon')  applyFavicon();
   document.querySelector('[style*="position:fixed"]')?.remove();
   showSiteToast('图片已更新');
+  window.syncToServer();
 }
 
-// ── Floating edit bar (shown when in admin mode on front pages)
+// ── Floating edit bar
 function injectEditBar() {
   const bar = document.createElement('div');
   bar.id = 'editBar';
@@ -147,17 +203,30 @@ function saveFrontChanges() {
   document.querySelectorAll('[data-editable]').forEach(el => {
     localStorage.setItem('edit_' + el.getAttribute('data-editable'), el.textContent);
   });
-  showSiteToast('✅ 已保存所有内容');
+  window.syncToServer(
+    () => showSiteToast('✅ 已保存并同步到服务器'),
+    () => showSiteToast('✅ 已本地保存（服务器同步失败，请检查api.php）')
+  );
 }
 
 function exitAdminMode() {
   if (!confirm('确定退出编辑模式？')) return;
+  // Server-side logout
+  const token = getApiToken();
+  if (token) {
+    fetch('api.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout', token })
+    }).catch(() => {});
+  }
+  sessionStorage.removeItem(API_TOKEN_KEY);
   localStorage.removeItem(ADMIN_SESSION_KEY);
   location.reload();
 }
 
 // ── Toast
-function showSiteToast(msg, duration=2500) {
+function showSiteToast(msg, duration=2800) {
   let t = document.getElementById('siteToast');
   if (!t) {
     t = document.createElement('div');
@@ -175,27 +244,34 @@ window.showSiteToast = showSiteToast;
 function initScrollAnim() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.style.opacity = '1';
-        e.target.style.transform = 'translateY(0)';
-      }
+      if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
     });
   }, { threshold: 0.08 });
   document.querySelectorAll('.feature-card,.product-preview-card,.product-card,.team-card,.cert-item,.mission-card,.product-category-section').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(28px)';
-    el.style.transition = 'opacity .55s ease, transform .55s ease';
+    el.style.opacity='0'; el.style.transform='translateY(28px)';
+    el.style.transition='opacity .55s ease, transform .55s ease';
     obs.observe(el);
   });
 }
 
-// ── INIT
-document.addEventListener('DOMContentLoaded', () => {
+// ── Render after data is ready
+function renderPage() {
   loadEditableContent();
+  if (typeof applyAllBtnActions === 'function') applyAllBtnActions();
+  if (typeof renderAllCategories  === 'function') renderAllCategories();
   if (isAdminMode()) {
     injectEditBar();
     enableEditMode();
     setTimeout(loadEditableContent, 30);
   }
   initScrollAnim();
+}
+
+// ── INIT: fetch server data first, then render
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('api.php')
+    .then(r => { if (!r.ok) throw new Error('no api'); return r.json(); })
+    .then(data => { hydrateFromServerData(data); })
+    .catch(() => { /* api.php not present or empty — use localStorage only */ })
+    .finally(() => { renderPage(); });
 });

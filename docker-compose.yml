@@ -1,0 +1,43 @@
+services:
+  web:
+    build: .
+    container_name: globaltrade-web
+    restart: unless-stopped          # auto-restart on server reboot
+    ports:
+      - "14514:80"                    # change 14514 to any free port on your VPS
+                                     # if using a panel (1Panel/aaPanel) as reverse proxy,
+                                     # set the panel to proxy requests to localhost:14514
+    volumes:
+      # Persist the two data files across container rebuilds
+      # These files live on your VPS at ./data/ — never lost on docker restart
+      - ./data/site-data.json:/var/www/html/site-data.json
+      - ./data/api-state.json:/var/www/html/api-state.json
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+
+# ── Usage ─────────────────────────────────────────────────────────
+#
+# First-time setup:
+#   mkdir -p data
+#   echo '{}' > data/site-data.json
+#   echo '{}' > data/api-state.json
+#   docker compose up -d --build
+#
+# Update site after code changes:
+#   docker compose up -d --build
+#   (data files in ./data/ are untouched)
+#
+# View logs:
+#   docker compose logs -f
+#
+# Stop:
+#   docker compose down
+#
+# ── Panel integration (1Panel / aaPanel / BT Panel) ───────────────
+# 1. Deploy this container on port 8080 (or any unused port).
+# 2. In your panel, create a "Reverse Proxy" website:
+#      Domain:        yourdomain.com
+#      Proxy target:  http://127.0.0.1:8080
+# 3. Apply SSL via the panel's built-in Let's Encrypt button.
+#    The container itself does not need to handle HTTPS.

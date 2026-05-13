@@ -1,39 +1,58 @@
-# Simple Business Website
+# Simple-Business-Websitebuilder
 
 > 🌐 [中文文档](README_CN.md) | **English**
 
-A fully-featured B2B trade website template with bilingual support (Chinese / English), a visual admin panel, real-time sidebar editor, one-click Linux VPS deployment, and zero backend dependencies.
+A fully-featured B2B trade website template with bilingual support (Chinese / English), a visual admin panel, real-time sidebar editor, and one-click Linux VPS deployment. Admin changes are persisted to the server via a lightweight PHP API — visible to all visitors with no database required.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-trade-website/
+Simple-Business-Websitebuilder/
 ├── index.html            # Home page
 ├── products.html         # Products page (all categories shown vertically)
 ├── about.html            # About Us page
 ├── contact.html          # Contact Us page
 ├── admin.html            # Admin panel — access via /admin.html
+├── api.php               # ★ Backend API: persistent storage, session token auth
 ├── css/
 │   ├── style.css         # Main stylesheet + CSS theme variables
 │   └── admin.css         # Admin panel stylesheet
 ├── js/
 │   ├── i18n.js           # Bilingual switching (ZH / EN)
-│   ├── main.js           # Core logic, edit mode, logo / favicon, theme colors
+│   ├── main.js           # Core logic, edit mode, logo / favicon, theme, server sync
 │   ├── btn-actions.js    # Button action manager (page jump / email / external URL)
 │   ├── sidebar-editor.js # Real-time sidebar editor with live preview
-│   ├── products-data.js  # Product data store (localStorage)
+│   ├── products-data.js  # Product data store
 │   ├── products.js       # Products page rendering & management
 │   └── admin.js          # Admin panel logic
-├── deploy.sh             # One-click VPS deployment script
+├── Dockerfile            # Docker image build file
+├── docker-compose.yml    # Docker Compose configuration
+├── deploy.sh             # Bare-metal one-click deploy script (Nginx + PHP-FPM)
 ├── README.md             # This file (English)
 └── README_CN.md          # Chinese documentation
 ```
 
 ---
 
-## 🚀 One-Click VPS Deployment
+## 🔑 How Data Persistence Works
+
+`api.php` is the project's backend — ~120 lines of PHP, no database:
+
+| Request | Purpose |
+|---------|---------|
+| GET `api.php` | Returns `site-data.json` (front-end pages read this on load) |
+| POST `login` | Verifies bcrypt-hashed password, issues a timed session token |
+| POST `save` | Validates token, writes full site state to `site-data.json` |
+| POST `change_password` | Validates token, updates bcrypt hash, invalidates token |
+| POST `logout` | Server-side token invalidation |
+
+**Flow**: Admin logs in → server issues token → every save pushes data to server → visitors' browsers fetch the latest data from `api.php` on page load.
+
+---
+
+## 🚀 Option A: Bare-Metal Deploy (Nginx + PHP-FPM)
 
 ### Prerequisites
 
@@ -45,19 +64,19 @@ trade-website/
 
 **Option A: Clone from GitHub (recommended)**
 ```bash
-git clone https://github.com/your-username/trade-website.git /root/trade-website
-cd /root/trade-website
+git clone https://github.com/your-username/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
+cd /root/Simple-Business-Websitebuilder
 ```
 
 **Option B: Upload via SCP from your local machine**
 ```bash
-scp -r ./trade-website root@your-server-ip:/root/
+scp -r ./Simple-Business-Websitebuilder root@your-server-ip:/root/
 ```
 
 ### Step 2 — Run the Deploy Script
 
 ```bash
-cd /root/trade-website
+cd /root/Simple-Business-Websitebuilder
 chmod +x deploy.sh
 
 # HTTP only
@@ -68,9 +87,10 @@ bash deploy.sh yourdomain.com --ssl
 ```
 
 The script automatically:
-- Installs Nginx if not already present
-- Copies site files to `/var/www/globaltrade/`
-- Writes and enables an optimised Nginx server block
+- Installs Nginx and **PHP-FPM** (required to run `api.php`)
+- Copies all site files to `/var/www/globaltrade/`
+- Creates `site-data.json` and `api-state.json` with correct write permissions
+- Writes an optimised Nginx config with PHP support and JSON file protection
 - Opens firewall ports 80 and 443
 - Optionally obtains and configures an SSL certificate
 
@@ -81,6 +101,65 @@ The script automatically:
 | `http://yourdomain.com` | Public website |
 | `http://yourdomain.com/admin.html` | Admin panel |
 | Default password | `admin123` — **change this immediately after first login** |
+
+---
+
+## 🐳 Option B: Docker Deploy (recommended when 1Panel / aaPanel is already installed)
+
+Panel tools typically occupy ports 80/443 and run their own Nginx/OpenResty, which can conflict with the bare-metal script. Docker isolates the site completely; the panel's reverse proxy feature handles external traffic.
+
+### Prerequisites
+
+```bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Install Docker Compose
+apt-get install -y docker-compose-plugin
+```
+
+### Step 1 — Get the Code
+
+```bash
+git clone https://github.com/your-username/Simple-Business-Websitebuilder.git /root/Simple-Business-Websitebuilder
+cd /root/Simple-Business-Websitebuilder
+```
+
+### Step 2 — Initialise Data Directory
+
+```bash
+mkdir -p data
+echo '{}' > data/site-data.json
+echo '{}' > data/api-state.json
+```
+
+### Step 3 — Start the Container
+
+```bash
+docker compose up -d --build
+```
+
+The container listens on port `14514` (change in `docker-compose.yml` if needed).
+
+### Step 4 — Configure Reverse Proxy in Your Panel
+
+**1Panel example:**
+1. Website → Create → choose **Reverse Proxy**
+2. Domain: your domain; Proxy target: `http://127.0.0.1:14514`
+3. Apply SSL via the panel's built-in Let's Encrypt button
+
+Other panels (aaPanel, BT Panel) work the same — create a reverse proxy site pointing to `127.0.0.1:14514`.
+
+### Common Commands
+
+```bash
+docker compose ps          # status
+docker compose logs -f     # live logs
+docker compose down        # stop
+git pull && docker compose up -d --build   # update code (data preserved)
+```
+
+> **Data persistence**: `site-data.json` and `api-state.json` are bind-mounted from `./data/` on the host. Rebuilding or restarting the container never touches these files.
 
 ---
 
@@ -227,13 +306,13 @@ git push
 
 # VPS — pull and sync
 ssh root@your-server-ip
-cd /root/trade-website
+cd /root/Simple-Business-Websitebuilder
 git pull
 cp -r *.html css js /var/www/globaltrade/
 systemctl reload nginx
 ```
 
-> **Tip:** To skip the manual `cp` step on every update, change `SITE_DIR` in `deploy.sh` to `/root/trade-website` before running it. Nginx will then serve files directly from the Git repository directory, so `git pull` alone is enough to update the live site.
+> **Tip:** To skip the manual `cp` step on every update, change `SITE_DIR` in `deploy.sh` to `/root/Simple-Business-Websitebuilder` before running it. Nginx will then serve files directly from the Git repository directory, so `git pull` alone is enough to update the live site.
 
 ---
 
@@ -249,4 +328,4 @@ systemctl reload nginx
 
 ---
 
-*Built with ❤️ — Simple-Business-Website*
+*Built with ❤️ — [Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.1*

@@ -1,9 +1,11 @@
 #!/bin/bash
 # ============================================================
-# GlobalTrade Website - One-Click VPS Deploy Script
+# GlobalTrade Website - One-Click VPS Deploy Script v4
 # ============================================================
 # Usage: bash deploy.sh [domain] [--ssl]
 # Example: bash deploy.sh example.com --ssl
+#
+# Installs: Nginx + PHP-FPM (required for api.php backend)
 # ============================================================
 
 set -e
@@ -22,7 +24,7 @@ NC='\033[0m'
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════╗"
-echo "║   GlobalTrade Website Deployment v1.0    ║"
+echo "║   GlobalTrade Website Deployment v4.0    ║"
 echo "╚══════════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -39,11 +41,11 @@ echo "   SSL: ${ENABLE_SSL:-(跳过，稍后可手动执行)}"
 echo ""
 
 # ===== STEP 1: Update System =====
-echo -e "${BLUE}[1/6] 更新系统包...${NC}"
+echo -e "${BLUE}[1/7] 更新系统包...${NC}"
 apt-get update -qq
 
 # ===== STEP 2: Install Nginx =====
-echo -e "${BLUE}[2/6] 安装 Nginx...${NC}"
+echo -e "${BLUE}[2/7] 安装 Nginx...${NC}"
 if ! command -v nginx &> /dev/null; then
   apt-get install -y nginx
   echo -e "${GREEN}✅ Nginx 安装完成${NC}"
@@ -51,29 +53,47 @@ else
   echo -e "${GREEN}✅ Nginx 已存在，跳过安装${NC}"
 fi
 
-# ===== STEP 3: Copy Site Files =====
-echo -e "${BLUE}[3/6] 部署网站文件...${NC}"
-mkdir -p "$SITE_DIR"
+# ===== STEP 3: Install PHP-FPM (required for api.php) =====
+echo -e "${BLUE}[3/7] 安装 PHP-FPM...${NC}"
+if ! command -v php &> /dev/null; then
+  apt-get install -y php-fpm php-json
+  echo -e "${GREEN}✅ PHP-FPM 安装完成${NC}"
+else
+  echo -e "${GREEN}✅ PHP 已存在，跳过安装${NC}"
+fi
 
-# Get current script directory (where the website files are)
+# Detect PHP-FPM socket path (varies by PHP version)
+PHP_SOCK=$(find /var/run/php/ -name "php*-fpm.sock" 2>/dev/null | head -1)
+if [ -z "$PHP_SOCK" ]; then
+  PHP_SOCK="/var/run/php/php-fpm.sock"
+fi
+echo "   PHP-FPM socket: $PHP_SOCK"
+
+# ===== STEP 4: Copy Site Files =====
+echo -e "${BLUE}[4/7] 部署网站文件...${NC}"
+mkdir -p "$SITE_DIR"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Copy all website files
 cp -r "$SCRIPT_DIR"/*.html "$SITE_DIR/"
-cp -r "$SCRIPT_DIR"/css "$SITE_DIR/"
-cp -r "$SCRIPT_DIR"/js "$SITE_DIR/"
-
-# Copy images dir if exists
+cp -r "$SCRIPT_DIR"/*.php  "$SITE_DIR/" 2>/dev/null || true
+cp -r "$SCRIPT_DIR"/css    "$SITE_DIR/"
+cp -r "$SCRIPT_DIR"/js     "$SITE_DIR/"
 [ -d "$SCRIPT_DIR/images" ] && cp -r "$SCRIPT_DIR"/images "$SITE_DIR/"
 
-# Set permissions
+# Create data files if they don't exist (preserve existing data on re-deploy)
+[ ! -f "$SITE_DIR/site-data.json"  ] && echo '{}' > "$SITE_DIR/site-data.json"
+[ ! -f "$SITE_DIR/api-state.json"  ] && echo '{}' > "$SITE_DIR/api-state.json"
+
+# Set permissions: www-data owns everything; data files are writable by web server
 chown -R www-data:www-data "$SITE_DIR"
 chmod -R 755 "$SITE_DIR"
+chmod 660 "$SITE_DIR/site-data.json" "$SITE_DIR/api-state.json"
 
 echo -e "${GREEN}✅ 网站文件部署完成 → $SITE_DIR${NC}"
 
-# ===== STEP 4: Configure Nginx =====
-echo -e "${BLUE}[4/6] 配置 Nginx...${NC}"
+# ===== STEP 5: Configure Nginx =====
+echo -e "${BLUE}[5/7] 配置 Nginx (含 PHP 支持)...${NC}"
 
 cat > "$NGINX_CONF" << EOF
 server {
@@ -93,10 +113,28 @@ server {
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
     gzip_min_length 1000;
 
-    # Cache static assets
-    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2)$ {
+    # Cache static assets (JS/CSS get short cache so admin edits propagate quickly)
+    location ~* \.(jpg|jpeg|png|gif|ico|svg|woff|woff2)$ {
         expires 30d;
         add_header Cache-Control "public, immutable";
+    }
+    location ~* \.(css|js)$ {
+        expires 1h;
+        add_header Cache-Control "public, must-revalidate";
+    }
+
+    # PHP — only api.php is executable; block all other .php files for security
+    location = /api.php {
+        fastcgi_pass unix:$PHP_SOCK;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Block direct access to data files
+    location ~ \.(json)$ {
+        deny all;
+        return 403;
     }
 
     # Main routing
@@ -104,9 +142,9 @@ server {
         try_files \$uri \$uri/ \$uri.html =404;
     }
 
-    # Admin protection (optional: restrict by IP)
+    # Optional: restrict admin.html by IP (uncomment and set your IP)
     # location = /admin.html {
-    #     allow YOUR_IP;
+    #     allow YOUR.IP.ADDRESS.HERE;
     #     deny all;
     # }
 
@@ -120,17 +158,15 @@ server {
 }
 EOF
 
-# Enable site
 ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/globaltrade 2>/dev/null || true
 rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 
-# Test and reload nginx
 nginx -t && systemctl reload nginx
 
 echo -e "${GREEN}✅ Nginx 配置完成${NC}"
 
-# ===== STEP 5: Firewall =====
-echo -e "${BLUE}[5/6] 配置防火墙...${NC}"
+# ===== STEP 6: Firewall =====
+echo -e "${BLUE}[6/7] 配置防火墙...${NC}"
 if command -v ufw &> /dev/null; then
   ufw allow 80/tcp
   ufw allow 443/tcp
@@ -140,8 +176,8 @@ else
   echo -e "${YELLOW}⚠ UFW 未安装，请手动配置防火墙开放 80/443 端口${NC}"
 fi
 
-# ===== STEP 6: SSL (optional) =====
-echo -e "${BLUE}[6/6] SSL 证书...${NC}"
+# ===== STEP 7: SSL (optional) =====
+echo -e "${BLUE}[7/7] SSL 证书...${NC}"
 if [ "$ENABLE_SSL" = "--ssl" ]; then
   echo "正在安装 Certbot (Let's Encrypt)..."
   if ! command -v certbot &> /dev/null; then
@@ -164,6 +200,10 @@ echo -e "  🌐 网站地址：${BLUE}http://$DOMAIN${NC}"
 echo -e "  ⚙  管理后台：${BLUE}http://$DOMAIN/admin.html${NC}"
 echo -e "  🔑 默认密码：${YELLOW}admin123${NC}（请登录后立即修改）"
 echo -e "  📁 网站目录：$SITE_DIR"
+echo -e "  🗄  数据文件：$SITE_DIR/site-data.json"
 echo ""
-echo -e "${YELLOW}⚠ 安全提醒：登录管理后台后请立即修改默认密码！${NC}"
+echo -e "${YELLOW}⚠ 安全提醒：${NC}"
+echo -e "   1. 登录管理后台后请立即修改默认密码"
+echo -e "   2. 强烈建议启用 HTTPS（加 --ssl 参数）"
+echo -e "   3. 可在 Nginx 配置中为 /admin.html 加 IP 白名单"
 echo ""
