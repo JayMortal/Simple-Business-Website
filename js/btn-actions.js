@@ -6,23 +6,30 @@
 
 // Registry of all configurable buttons
 window.BTN_REGISTRY = [
-  { key: 'hero.btn1',       label: 'Hero 按钮1（探索产品）',     defaultType: 'page',  defaultTarget: 'products.html' },
-  { key: 'hero.btn2',       label: 'Hero 按钮2（立即联系）',     defaultType: 'page',  defaultTarget: 'contact.html'  },
-  { key: 'featured.more',   label: '首页「查看全部产品」按钮',     defaultType: 'page',  defaultTarget: 'products.html' },
-  { key: 'cta.btn',         label: '首页 CTA 按钮（免费咨询）',  defaultType: 'page',  defaultTarget: 'contact.html'  },
-  { key: 'social.wechat',   label: '联系页 WeChat 按钮',         defaultType: 'email', defaultTarget: ''              },
-  { key: 'social.linkedin',  label: '联系页 LinkedIn 按钮',      defaultType: 'external', defaultTarget: 'https://linkedin.com' },
-  { key: 'social.whatsapp', label: '联系页 WhatsApp 按钮',       defaultType: 'external', defaultTarget: 'https://wa.me/' },
-  { key: 'contact.submitBtn', label: '联系页「发送询盘」按钮',    defaultType: 'email', defaultTarget: ''              },
+  { key: 'hero.btn1',        labelZh: 'Hero 按钮1（探索产品）',      labelEn: 'Hero Button 1 (Explore Products)',   defaultType: 'page',     defaultTarget: 'products.html'       },
+  { key: 'hero.btn2',        labelZh: 'Hero 按钮2（立即联系）',      labelEn: 'Hero Button 2 (Contact Us)',         defaultType: 'page',     defaultTarget: 'contact.html'        },
+  { key: 'featured.more',    labelZh: '首页「查看全部产品」按钮',      labelEn: 'Home — View All Products button',    defaultType: 'page',     defaultTarget: 'products.html'       },
+  { key: 'cta.btn',          labelZh: '首页 CTA 按钮（免费咨询）',   labelEn: 'Home CTA Button (Free Consultation)', defaultType: 'page',     defaultTarget: 'contact.html'        },
+  { key: 'social.wechat',    labelZh: '联系页 WeChat 按钮',          labelEn: 'Contact — WeChat button',            defaultType: 'email',    defaultTarget: ''                    },
+  { key: 'social.linkedin',  labelZh: '联系页 LinkedIn 按钮',        labelEn: 'Contact — LinkedIn button',          defaultType: 'external', defaultTarget: 'https://linkedin.com' },
+  { key: 'social.whatsapp',  labelZh: '联系页 WhatsApp 按钮',        labelEn: 'Contact — WhatsApp button',          defaultType: 'external', defaultTarget: 'https://wa.me/'      },
+  { key: 'contact.submitBtn',labelZh: '联系页「发送询盘」按钮',       labelEn: 'Contact — Send Inquiry button',      defaultType: 'email',    defaultTarget: ''                    },
 ];
+// Expose .label as a getter so existing code (admin.js renderBtnEditor) works unchanged
+window.BTN_REGISTRY.forEach(b => Object.defineProperty(b, 'label', {
+  get: () => localStorage.getItem('adminLang') === 'en' ? b.labelEn : b.labelZh,
+  enumerable: true, configurable: true
+}));
 
 // NOTE: must be window.PAGES (not const) so admin.js can read it cross-script
+// Page labels are bilingual; admin.js picks the right one via adminLang
 window.PAGES = [
-  { value: 'index.html',    label: '首页 (index.html)'     },
-  { value: 'products.html', label: '产品介绍 (products.html)' },
-  { value: 'about.html',    label: '关于我们 (about.html)'  },
-  { value: 'contact.html',  label: '联系我们 (contact.html)' },
+  { value: 'index.html',    labelZh: '首页 (index.html)',        labelEn: 'Home (index.html)'     },
+  { value: 'products.html', labelZh: '产品介绍 (products.html)', labelEn: 'Products (products.html)' },
+  { value: 'about.html',    labelZh: '关于我们 (about.html)',    labelEn: 'About Us (about.html)'  },
+  { value: 'contact.html',  labelZh: '联系我们 (contact.html)', labelEn: 'Contact (contact.html)' },
 ];
+window.PAGES.forEach(p => Object.defineProperty(p, 'label', { get: () => localStorage.getItem('adminLang')==='en' ? p.labelEn : p.labelZh }));
 
 function getBtnAction(key) {
   const stored = localStorage.getItem('btn_action_' + key);

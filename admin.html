@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理后台 | GlobalTrade Admin</title>
+  <title id="adminPageTitle">管理后台 | GlobalTrade Admin</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -14,18 +14,18 @@
 <div class="admin-login-overlay" id="loginOverlay">
   <div class="admin-login-box">
     <div class="login-logo"><span class="logo-icon">⬡</span><span>GlobalTrade Admin</span></div>
-    <h2>管理后台登录</h2>
-    <p class="login-sub">请输入管理员密码以进入编辑模式</p>
+    <h2 id="loginTitle">管理后台登录</h2>
+    <p class="login-sub" id="loginSub">请输入管理员密码以进入编辑模式</p>
     <div class="form-group" style="text-align:left">
-      <label>管理员密码</label>
+      <label id="loginPwdLabel">管理员密码</label>
       <input type="password" id="adminPassword" placeholder="请输入密码">
     </div>
     <button id="loginBtn" class="btn btn-primary btn-full" onclick="doLogin()">登 录</button>
-    <p class="login-hint">默认密码：<code>admin123</code>（登录后请立即修改）</p>
+    <p class="login-hint" id="loginHint">默认密码：<code>admin123</code>（登录后请立即修改）</p>
     <div class="login-error" id="loginError"></div>
     <div class="login-error" id="lockoutMsg" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;display:none;padding:10px;border-radius:6px;margin-top:12px;font-size:.85rem"></div>
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
-      <p style="color:#bbb;font-size:.78rem;text-align:center">🔒 连续 5 次错误将锁定 15 分钟</p>
+      <p style="color:#bbb;font-size:.78rem;text-align:center" id="loginErrLockMsg">🔒 连续 5 次错误将锁定 15 分钟</p>
     </div>
   </div>
 </div>
@@ -60,21 +60,22 @@
     </div>
 
     <nav class="sidebar-nav">
-      <div class="sidebar-section-label">页面内容</div>
+      <div class="sidebar-section-label" data-ail="secPages">页面内容</div>
       <a href="#" class="sidebar-link active" onclick="switchPage('home')">🏠 首页</a>
       <a href="#" class="sidebar-link" onclick="switchPage('products')">📦 产品介绍</a>
       <a href="#" class="sidebar-link" onclick="switchPage('about')">👥 关于我们</a>
       <a href="#" class="sidebar-link" onclick="switchPage('contact')">✉ 联系我们</a>
       <a href="#" class="sidebar-link" onclick="switchPage('buttons')">🔘 按钮管理</a>
-      <div class="sidebar-section-label" style="margin-top:16px">系统设置</div>
+      <div class="sidebar-section-label" style="margin-top:16px" data-ail="secSystem">系统设置</div>
       <a href="#" class="sidebar-link" onclick="switchPage('settings')">⚙ 网站设置</a>
       <a href="#" class="sidebar-link" onclick="switchPage('theme')">🎨 主题颜色</a>
       <a href="#" class="sidebar-link" onclick="switchPage('password')">🔒 修改密码</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('update')">🔄 检查更新</a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="btn-logout" onclick="doLogout()">退出登录</button>
-      <div class="sidebar-version">v5.0.0 · 双语版</div>
+      <button class="btn-logout" id="logoutBtn" onclick="doLogout()">退出登录</button>
+      <div class="sidebar-version">v0.1</div>
     </div>
   </aside>
 
@@ -89,96 +90,96 @@
           <button onclick="switchAdminLang('zh')" id="adminLangZh" style="padding:3px 10px;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-family:inherit;background:#0a1628;color:#fff">中文</button>
           <button onclick="switchAdminLang('en')" id="adminLangEn" style="padding:3px 10px;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-family:inherit;background:transparent;color:#666">EN</button>
         </div>
-        <button class="btn btn-secondary" onclick="previewPage()">👁 预览页面</button>
-        <button class="btn btn-primary" onclick="saveAll()">💾 保存更改</button>
+        <button class="btn btn-secondary" id="topPreviewBtn" onclick="previewPage()">👁 预览页面</button>
+        <button class="btn btn-primary" id="topSaveBtn" onclick="saveAll()">💾 保存更改</button>
       </div>
     </div>
 
     <!-- ═══ HOME PAGE ═══ -->
     <div class="admin-content" id="page-home">
-      <h2 class="admin-page-title">首页内容管理</h2>
+      <h2 class="admin-page-title" data-ail="pageHomeTitle">首页内容管理</h2>
 
       <div class="admin-card">
-        <h3>Hero 横幅</h3>
+        <h3 data-ail="heroCard">Hero 横幅</h3>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>标签文字</label><input type="text" data-key="hero.tag" id="f-hero.tag" placeholder="全球领先的贸易伙伴"></div>
-          <div class="admin-field"><label>主标题</label><input type="text" data-key="hero.title" id="f-hero.title" placeholder="连接世界 共创未来"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>副标题描述</label><textarea rows="3" data-key="hero.desc" id="f-hero.desc" placeholder="专注国际贸易20余年..."></textarea></div>
-          <div class="admin-field"><label>按钮1文字</label><input type="text" data-key="hero.btn1" id="f-hero.btn1" placeholder="探索产品"></div>
-          <div class="admin-field"><label>按钮2文字</label><input type="text" data-key="hero.btn2" id="f-hero.btn2" placeholder="立即联系"></div>
+          <div class="admin-field"><label data-ail="heroTag">标签文字</label><input type="text" data-key="hero.tag" id="f-hero.tag" placeholder="全球领先的贸易伙伴"></div>
+          <div class="admin-field"><label data-ail="heroTitle">主标题</label><input type="text" data-key="hero.title" id="f-hero.title" placeholder="连接世界 共创未来"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="heroDesc">副标题描述</label><textarea rows="3" data-key="hero.desc" id="f-hero.desc" placeholder="专注国际贸易20余年..."></textarea></div>
+          <div class="admin-field"><label data-ail="heroBtn1">按钮1文字</label><input type="text" data-key="hero.btn1" id="f-hero.btn1" placeholder="探索产品"></div>
+          <div class="admin-field"><label data-ail="heroBtn2">按钮2文字</label><input type="text" data-key="hero.btn2" id="f-hero.btn2" placeholder="立即联系"></div>
         </div>
-        <div class="admin-field"><label>Hero 背景图片</label>
+        <div class="admin-field"><label data-ail="heroBgImg">Hero 背景图片</label>
           <div class="img-editor">
             <img class="img-preview" id="prev-hero.image" src="https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?w=400&q=80">
             <div class="img-controls">
-              <input type="url" id="f-hero.image" data-img-key="hero.image" placeholder="图片URL">
-              <div class="or-divider">或</div>
-              <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'hero.image')"></label>
-              <button class="btn btn-sm" onclick="applyImgUrl('hero.image')">应用URL</button>
+              <input type="url" id="f-hero.image" data-img-key="hero.image" data-ail-ph="imgUrl" placeholder="图片URL">
+              <div class="or-divider" data-ail="orDivider">或</div>
+              <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'hero.image')"></label>
+              <button class="btn btn-sm" onclick="applyImgUrl('hero.image')" data-ail="applyUrl">应用URL</button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>统计数据栏</h3>
+        <h3 data-ail="statsCard">统计数据栏</h3>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>年份数字（如 20+）</label><input type="text" data-key="stats.years" id="f-stats.years" placeholder="20+"></div>
-          <div class="admin-field"><label>年份标签</label><input type="text" data-key="stats.yearsLabel" id="f-stats.yearsLabel" placeholder="年行业经验"></div>
-          <div class="admin-field"><label>国家数字</label><input type="text" data-key="stats.countries" id="f-stats.countries" placeholder="80+"></div>
-          <div class="admin-field"><label>国家标签</label><input type="text" data-key="stats.countriesLabel" id="f-stats.countriesLabel" placeholder="覆盖国家地区"></div>
-          <div class="admin-field"><label>客户数字</label><input type="text" data-key="stats.clients" id="f-stats.clients" placeholder="5000+"></div>
-          <div class="admin-field"><label>客户标签</label><input type="text" data-key="stats.clientsLabel" id="f-stats.clientsLabel" placeholder="全球合作客户"></div>
-          <div class="admin-field"><label>产品数字</label><input type="text" data-key="stats.products" id="f-stats.products" placeholder="1200+"></div>
-          <div class="admin-field"><label>产品标签</label><input type="text" data-key="stats.productsLabel" id="f-stats.productsLabel" placeholder="产品品类"></div>
+          <div class="admin-field"><label data-ail="statsYearsNum">年份数字（如 20+）</label><input type="text" data-key="stats.years" id="f-stats.years" placeholder="20+"></div>
+          <div class="admin-field"><label data-ail="statsYearsLabel">年份标签</label><input type="text" data-key="stats.yearsLabel" id="f-stats.yearsLabel" placeholder="年行业经验"></div>
+          <div class="admin-field"><label data-ail="statsCountriesNum">国家数字</label><input type="text" data-key="stats.countries" id="f-stats.countries" placeholder="80+"></div>
+          <div class="admin-field"><label data-ail="statsCountriesLabel">国家标签</label><input type="text" data-key="stats.countriesLabel" id="f-stats.countriesLabel" placeholder="覆盖国家地区"></div>
+          <div class="admin-field"><label data-ail="statsClientsNum">客户数字</label><input type="text" data-key="stats.clients" id="f-stats.clients" placeholder="5000+"></div>
+          <div class="admin-field"><label data-ail="statsClientsLabel">客户标签</label><input type="text" data-key="stats.clientsLabel" id="f-stats.clientsLabel" placeholder="全球合作客户"></div>
+          <div class="admin-field"><label data-ail="statsProductsNum">产品数字</label><input type="text" data-key="stats.products" id="f-stats.products" placeholder="1200+"></div>
+          <div class="admin-field"><label data-ail="statsProductsLabel">产品标签</label><input type="text" data-key="stats.productsLabel" id="f-stats.productsLabel" placeholder="产品品类"></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>优势特色区域</h3>
-        <div class="admin-field"><label>区域标题</label><input type="text" data-key="features.title" id="f-features.title" placeholder="为何选择我们"></div>
-        <div class="admin-field"><label>区域副标题</label><input type="text" data-key="features.sub" id="f-features.sub" placeholder="多年深耕国际贸易..."></div>
+        <h3 data-ail="featuresCard">优势特色区域</h3>
+        <div class="admin-field"><label data-ail="featuresTitle">区域标题</label><input type="text" data-key="features.title" id="f-features.title" placeholder="为何选择我们"></div>
+        <div class="admin-field"><label data-ail="featuresSub">区域副标题</label><input type="text" data-key="features.sub" id="f-features.sub" placeholder="多年深耕国际贸易..."></div>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>特色1 标题</label><input type="text" data-key="feat1.title" id="f-feat1.title" placeholder="全球网络"></div>
-          <div class="admin-field"><label>特色1 描述</label><textarea data-key="feat1.desc" id="f-feat1.desc" rows="2" placeholder="覆盖80+国家..."></textarea></div>
-          <div class="admin-field"><label>特色2 标题</label><input type="text" data-key="feat2.title" id="f-feat2.title" placeholder="品质保障"></div>
-          <div class="admin-field"><label>特色2 描述</label><textarea data-key="feat2.desc" id="f-feat2.desc" rows="2"></textarea></div>
-          <div class="admin-field"><label>特色3 标题</label><input type="text" data-key="feat3.title" id="f-feat3.title" placeholder="高效交付"></div>
-          <div class="admin-field"><label>特色3 描述</label><textarea data-key="feat3.desc" id="f-feat3.desc" rows="2"></textarea></div>
-          <div class="admin-field"><label>特色4 标题</label><input type="text" data-key="feat4.title" id="f-feat4.title" placeholder="专业服务"></div>
-          <div class="admin-field"><label>特色4 描述</label><textarea data-key="feat4.desc" id="f-feat4.desc" rows="2"></textarea></div>
+          <div class="admin-field"><label data-ail="feat1Title">特色1 标题</label><input type="text" data-key="feat1.title" id="f-feat1.title" placeholder="全球网络"></div>
+          <div class="admin-field"><label data-ail="feat1Desc">特色1 描述</label><textarea data-key="feat1.desc" id="f-feat1.desc" rows="2" placeholder="覆盖80+国家..."></textarea></div>
+          <div class="admin-field"><label data-ail="feat2Title">特色2 标题</label><input type="text" data-key="feat2.title" id="f-feat2.title" placeholder="品质保障"></div>
+          <div class="admin-field"><label data-ail="feat2Desc">特色2 描述</label><textarea data-key="feat2.desc" id="f-feat2.desc" rows="2"></textarea></div>
+          <div class="admin-field"><label data-ail="feat3Title">特色3 标题</label><input type="text" data-key="feat3.title" id="f-feat3.title" placeholder="高效交付"></div>
+          <div class="admin-field"><label data-ail="feat3Desc">特色3 描述</label><textarea data-key="feat3.desc" id="f-feat3.desc" rows="2"></textarea></div>
+          <div class="admin-field"><label data-ail="feat4Title">特色4 标题</label><input type="text" data-key="feat4.title" id="f-feat4.title" placeholder="专业服务"></div>
+          <div class="admin-field"><label data-ail="feat4Desc">特色4 描述</label><textarea data-key="feat4.desc" id="f-feat4.desc" rows="2"></textarea></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>精选产品（首页展示的3个预览产品）</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">这3个产品仅用于首页展示，完整产品请在"产品介绍"页面管理。</p>
+        <h3 data-ail="featuredCard">精选产品（首页展示的3个预览产品）</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="featuredNote">这3个产品仅用于首页展示，完整产品请在"产品介绍"页面管理。</p>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>产品1 分类标签</label><input type="text" data-key="fp1.cat" id="f-fp1.cat" placeholder="电子产品"></div>
-          <div class="admin-field"><label>产品1 名称</label><input type="text" data-key="fp1.name" id="f-fp1.name" placeholder="智能控制模块"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>产品1 描述</label><input type="text" data-key="fp1.desc" id="f-fp1.desc" placeholder="高性能工业级..."></div>
-          <div class="admin-field"><label>产品2 分类标签</label><input type="text" data-key="fp2.cat" id="f-fp2.cat" placeholder="机械配件"></div>
-          <div class="admin-field"><label>产品2 名称</label><input type="text" data-key="fp2.name" id="f-fp2.name" placeholder="精密轴承组件"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>产品2 描述</label><input type="text" data-key="fp2.desc" id="f-fp2.desc"></div>
-          <div class="admin-field"><label>产品3 分类标签</label><input type="text" data-key="fp3.cat" id="f-fp3.cat" placeholder="包装材料"></div>
-          <div class="admin-field"><label>产品3 名称</label><input type="text" data-key="fp3.name" id="f-fp3.name" placeholder="环保包装解决方案"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>产品3 描述</label><input type="text" data-key="fp3.desc" id="f-fp3.desc"></div>
+          <div class="admin-field"><label data-ail="fp1Cat">产品1 分类标签</label><input type="text" data-key="fp1.cat" id="f-fp1.cat" placeholder="电子产品"></div>
+          <div class="admin-field"><label data-ail="fp1Name">产品1 名称</label><input type="text" data-key="fp1.name" id="f-fp1.name" placeholder="智能控制模块"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="fp1Desc">产品1 描述</label><input type="text" data-key="fp1.desc" id="f-fp1.desc" placeholder="高性能工业级..."></div>
+          <div class="admin-field"><label data-ail="fp2Cat">产品2 分类标签</label><input type="text" data-key="fp2.cat" id="f-fp2.cat" placeholder="机械配件"></div>
+          <div class="admin-field"><label data-ail="fp2Name">产品2 名称</label><input type="text" data-key="fp2.name" id="f-fp2.name" placeholder="精密轴承组件"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="fp2Desc">产品2 描述</label><input type="text" data-key="fp2.desc" id="f-fp2.desc"></div>
+          <div class="admin-field"><label data-ail="fp3Cat">产品3 分类标签</label><input type="text" data-key="fp3.cat" id="f-fp3.cat" placeholder="包装材料"></div>
+          <div class="admin-field"><label data-ail="fp3Name">产品3 名称</label><input type="text" data-key="fp3.name" id="f-fp3.name" placeholder="环保包装解决方案"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="fp3Desc">产品3 描述</label><input type="text" data-key="fp3.desc" id="f-fp3.desc"></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>CTA 行动号召横幅</h3>
-        <div class="admin-field"><label>标题</label><input type="text" data-key="cta.title" id="f-cta.title" placeholder="准备好开始合作了吗？"></div>
-        <div class="admin-field"><label>描述</label><input type="text" data-key="cta.desc" id="f-cta.desc" placeholder="立即联系我们的专业团队..."></div>
-        <div class="admin-field"><label>按钮文字</label><input type="text" data-key="cta.btn" id="f-cta.btn" placeholder="免费咨询"></div>
-        <div class="admin-field"><label>背景图片</label>
+        <h3 data-ail="ctaCard">CTA 行动号召横幅</h3>
+        <div class="admin-field"><label data-ail="ctaTitle">标题</label><input type="text" data-key="cta.title" id="f-cta.title" placeholder="准备好开始合作了吗？"></div>
+        <div class="admin-field"><label data-ail="ctaDesc">描述</label><input type="text" data-key="cta.desc" id="f-cta.desc" placeholder="立即联系我们的专业团队..."></div>
+        <div class="admin-field"><label data-ail="ctaBtn">按钮文字</label><input type="text" data-key="cta.btn" id="f-cta.btn" placeholder="免费咨询"></div>
+        <div class="admin-field"><label data-ail="ctaBgImg">背景图片</label>
           <div class="img-editor">
             <img class="img-preview" id="prev-cta.image" src="https://images.unsplash.com/photo-1568992688065-536aad8a12f6?w=400&q=80">
             <div class="img-controls">
-              <input type="url" id="f-cta.image" data-img-key="cta.image" placeholder="图片URL">
-              <div class="or-divider">或</div>
-              <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'cta.image')"></label>
-              <button class="btn btn-sm" onclick="applyImgUrl('cta.image')">应用URL</button>
+              <input type="url" id="f-cta.image" data-img-key="cta.image" data-ail-ph="imgUrl" placeholder="图片URL">
+              <div class="or-divider" data-ail="orDivider">或</div>
+              <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'cta.image')"></label>
+              <button class="btn btn-sm" onclick="applyImgUrl('cta.image')" data-ail="applyUrl">应用URL</button>
             </div>
           </div>
         </div>
@@ -187,212 +188,210 @@
 
     <!-- ═══ PRODUCTS PAGE ═══ -->
     <div class="admin-content" id="page-products" style="display:none">
-      <h2 class="admin-page-title">产品介绍页管理</h2>
+      <h2 class="admin-page-title" data-ail="pageProductsTitle">产品介绍页管理</h2>
       <div class="admin-card">
-        <h3>产品页 Hero 图片</h3>
+        <h3 data-ail="productsHeroImg">产品页 Hero 图片</h3>
         <div class="img-editor">
           <img class="img-preview" id="prev-products.hero" src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&q=80">
           <div class="img-controls">
-            <input type="url" id="f-products.hero" data-img-key="products.hero" placeholder="图片URL">
-            <div class="or-divider">或</div>
-            <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'products.hero')"></label>
-            <button class="btn btn-sm" onclick="applyImgUrl('products.hero')">应用URL</button>
+            <input type="url" id="f-products.hero" data-img-key="products.hero" data-ail-ph="imgUrl" placeholder="图片URL">
+            <div class="or-divider" data-ail="orDivider">或</div>
+            <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'products.hero')"></label>
+            <button class="btn btn-sm" onclick="applyImgUrl('products.hero')" data-ail="applyUrl">应用URL</button>
           </div>
         </div>
       </div>
       <div class="admin-card">
         <div class="admin-actions-row">
-          <h3>产品分类与产品管理</h3>
-          <button class="btn btn-primary" onclick="adminAddCategory()">＋ 添加分类</button>
+          <h3 data-ail="productsMgmt">产品分类与产品管理</h3>
+          <button class="btn btn-primary" onclick="adminAddCategory()" data-ail="addCategory">＋ 添加分类</button>
         </div>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">• 分类数量最少1个 &nbsp;|&nbsp; • 每个分类产品数量最少1个 &nbsp;|&nbsp; • 支持中英双语</p>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="productsNote">• 分类数量最少1个 | • 每个分类产品数量最少1个 | • 支持中英双语</p>
         <div id="adminCatList"></div>
       </div>
     </div>
 
     <!-- ═══ ABOUT PAGE ═══ -->
     <div class="admin-content" id="page-about" style="display:none">
-      <h2 class="admin-page-title">关于我们页面管理</h2>
+      <h2 class="admin-page-title" data-ail="pageAboutTitle">关于我们页面管理</h2>
 
       <div class="admin-card">
-        <h3>页面 Hero 图片</h3>
+        <h3 data-ail="pageHeroImg">页面 Hero 图片</h3>
         <div class="img-editor">
           <img class="img-preview" id="prev-about.hero" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80">
           <div class="img-controls">
-            <input type="url" id="f-about.hero" data-img-key="about.hero" placeholder="图片URL">
-            <div class="or-divider">或</div>
-            <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'about.hero')"></label>
-            <button class="btn btn-sm" onclick="applyImgUrl('about.hero')">应用URL</button>
+            <input type="url" id="f-about.hero" data-img-key="about.hero" data-ail-ph="imgUrl" placeholder="图片URL">
+            <div class="or-divider" data-ail="orDivider">或</div>
+            <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'about.hero')"></label>
+            <button class="btn btn-sm" onclick="applyImgUrl('about.hero')" data-ail="applyUrl">应用URL</button>
           </div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>公司故事</h3>
-        <div class="admin-field"><label>故事主标题</label><input type="text" data-key="about.storyTitle" id="f-about.storyTitle" placeholder="从一粒种子到参天大树"></div>
-        <div class="admin-field"><label>段落1</label><textarea rows="3" data-key="about.storyP1" id="f-about.storyP1" placeholder="公司成立背景..."></textarea></div>
-        <div class="admin-field"><label>段落2</label><textarea rows="3" data-key="about.storyP2" id="f-about.storyP2" placeholder="团队规模..."></textarea></div>
-        <div class="admin-field"><label>段落3</label><textarea rows="3" data-key="about.storyP3" id="f-about.storyP3" placeholder="未来展望..."></textarea></div>
-        <div class="admin-field"><label>故事配图</label>
+        <h3 data-ail="storyCard">公司故事</h3>
+        <div class="admin-field"><label data-ail="storyTitle">故事主标题</label><input type="text" data-key="about.storyTitle" id="f-about.storyTitle" placeholder="从一粒种子到参天大树"></div>
+        <div class="admin-field"><label data-ail="storyP1">段落1</label><textarea rows="3" data-key="about.storyP1" id="f-about.storyP1" placeholder="公司成立背景..."></textarea></div>
+        <div class="admin-field"><label data-ail="storyP2">段落2</label><textarea rows="3" data-key="about.storyP2" id="f-about.storyP2" placeholder="团队规模..."></textarea></div>
+        <div class="admin-field"><label data-ail="storyP3">段落3</label><textarea rows="3" data-key="about.storyP3" id="f-about.storyP3" placeholder="未来展望..."></textarea></div>
+        <div class="admin-field"><label data-ail="storyImg">故事配图</label>
           <div class="img-editor">
             <img class="img-preview" id="prev-about.story" src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=300&q=80">
             <div class="img-controls">
-              <input type="url" id="f-about.story" data-img-key="about.story" placeholder="图片URL">
-              <div class="or-divider">或</div>
-              <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'about.story')"></label>
-              <button class="btn btn-sm" onclick="applyImgUrl('about.story')">应用URL</button>
+              <input type="url" id="f-about.story" data-img-key="about.story" data-ail-ph="imgUrl" placeholder="图片URL">
+              <div class="or-divider" data-ail="orDivider">或</div>
+              <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'about.story')"></label>
+              <button class="btn btn-sm" onclick="applyImgUrl('about.story')" data-ail="applyUrl">应用URL</button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>使命与价值观 <small style="color:#aaa;font-weight:normal;font-size:.8rem">（可直接修改文字，若不需要可留空后隐藏该区域）</small></h3>
-        <div class="admin-field"><label>使命与价值观 区域标题</label><input type="text" data-key="about.missionTitle" id="f-about.missionTitle" placeholder="驱动我们前行的力量"></div>
+        <h3 data-ail="missionCard">使命与价值观</h3>
+        <div class="admin-field"><label data-ail="missionAreaTitle">使命与价值观 区域标题</label><input type="text" data-key="about.missionTitle" id="f-about.missionTitle" placeholder="驱动我们前行的力量"></div>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>愿景 标题</label><input type="text" data-key="about.vision" id="f-about.vision" placeholder="愿景"></div>
-          <div class="admin-field"><label>愿景 内容</label><textarea rows="2" data-key="about.visionText" id="f-about.visionText" placeholder="成为最受信赖的全球贸易伙伴..."></textarea></div>
-          <div class="admin-field"><label>使命 标题</label><input type="text" data-key="about.mission" id="f-about.mission" placeholder="使命"></div>
-          <div class="admin-field"><label>使命 内容</label><textarea rows="2" data-key="about.missionText" id="f-about.missionText" placeholder="通过专业服务..."></textarea></div>
-          <div class="admin-field"><label>价值观 标题</label><input type="text" data-key="about.values" id="f-about.values" placeholder="价值观"></div>
-          <div class="admin-field"><label>价值观 内容</label><textarea rows="2" data-key="about.valuesText" id="f-about.valuesText" placeholder="诚信为本 · 专业精进..."></textarea></div>
+          <div class="admin-field"><label data-ail="visionTitle">愿景 标题</label><input type="text" data-key="about.vision" id="f-about.vision" placeholder="愿景"></div>
+          <div class="admin-field"><label data-ail="visionContent">愿景 内容</label><textarea rows="2" data-key="about.visionText" id="f-about.visionText" placeholder="成为最受信赖的全球贸易伙伴..."></textarea></div>
+          <div class="admin-field"><label data-ail="missionTitle">使命 标题</label><input type="text" data-key="about.mission" id="f-about.mission" placeholder="使命"></div>
+          <div class="admin-field"><label data-ail="missionContent">使命 内容</label><textarea rows="2" data-key="about.missionText" id="f-about.missionText" placeholder="通过专业服务..."></textarea></div>
+          <div class="admin-field"><label data-ail="valuesTitle">价值观 标题</label><input type="text" data-key="about.values" id="f-about.values" placeholder="价值观"></div>
+          <div class="admin-field"><label data-ail="valuesContent">价值观 内容</label><textarea rows="2" data-key="about.valuesText" id="f-about.valuesText" placeholder="诚信为本 · 专业精进..."></textarea></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>核心团队</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">小型公司可将团队介绍部分文字改为实际负责人信息，或直接修改文字内容。</p>
+        <h3 data-ail="teamCard">核心团队</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="teamNote">小型公司可将团队介绍部分文字改为实际负责人信息，或直接修改文字内容。</p>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>成员1 姓名</label><input type="text" data-key="team1.name" id="f-team1.name" placeholder="张明远"></div>
-          <div class="admin-field"><label>成员1 职位</label><input type="text" data-key="team1.role" id="f-team1.role" placeholder="创始人 & CEO"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>成员1 简介</label><textarea rows="2" data-key="team1.bio" id="f-team1.bio" placeholder="20年国际贸易经验..."></textarea></div>
-          <div class="admin-field"><label>成员2 姓名</label><input type="text" data-key="team2.name" id="f-team2.name" placeholder="李雪婷"></div>
-          <div class="admin-field"><label>成员2 职位</label><input type="text" data-key="team2.role" id="f-team2.role"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>成员2 简介</label><textarea rows="2" data-key="team2.bio" id="f-team2.bio"></textarea></div>
-          <div class="admin-field"><label>成员3 姓名</label><input type="text" data-key="team3.name" id="f-team3.name" placeholder="王志远"></div>
-          <div class="admin-field"><label>成员3 职位</label><input type="text" data-key="team3.role" id="f-team3.role"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>成员3 简介</label><textarea rows="2" data-key="team3.bio" id="f-team3.bio"></textarea></div>
+          <div class="admin-field"><label data-ail="member1Name">成员1 姓名</label><input type="text" data-key="team1.name" id="f-team1.name" placeholder="张明远"></div>
+          <div class="admin-field"><label data-ail="member1Role">成员1 职位</label><input type="text" data-key="team1.role" id="f-team1.role" placeholder="创始人 & CEO"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="member1Bio">成员1 简介</label><textarea rows="2" data-key="team1.bio" id="f-team1.bio" placeholder="20年国际贸易经验..."></textarea></div>
+          <div class="admin-field"><label data-ail="member2Name">成员2 姓名</label><input type="text" data-key="team2.name" id="f-team2.name" placeholder="李雪婷"></div>
+          <div class="admin-field"><label data-ail="member2Role">成员2 职位</label><input type="text" data-key="team2.role" id="f-team2.role"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="member2Bio">成员2 简介</label><textarea rows="2" data-key="team2.bio" id="f-team2.bio"></textarea></div>
+          <div class="admin-field"><label data-ail="member3Name">成员3 姓名</label><input type="text" data-key="team3.name" id="f-team3.name" placeholder="王志远"></div>
+          <div class="admin-field"><label data-ail="member3Role">成员3 职位</label><input type="text" data-key="team3.role" id="f-team3.role"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="member3Bio">成员3 简介</label><textarea rows="2" data-key="team3.bio" id="f-team3.bio"></textarea></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>荣誉资质</h3>
+        <h3 data-ail="certCard">荣誉资质</h3>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>资质1</label><input type="text" data-key="cert1" id="f-cert1" placeholder="ISO 9001:2015 质量管理体系认证"></div>
-          <div class="admin-field"><label>资质2</label><input type="text" data-key="cert2" id="f-cert2" placeholder="ISO 14001..."></div>
-          <div class="admin-field"><label>资质3</label><input type="text" data-key="cert3" id="f-cert3" placeholder="海关AEO高级认证企业"></div>
-          <div class="admin-field"><label>资质4</label><input type="text" data-key="cert4" id="f-cert4" placeholder="中国对外贸易质量奖"></div>
+          <div class="admin-field"><label data-ail="cert1">资质1</label><input type="text" data-key="cert1" id="f-cert1" placeholder="ISO 9001:2015 质量管理体系认证"></div>
+          <div class="admin-field"><label data-ail="cert2">资质2</label><input type="text" data-key="cert2" id="f-cert2" placeholder="ISO 14001..."></div>
+          <div class="admin-field"><label data-ail="cert3">资质3</label><input type="text" data-key="cert3" id="f-cert3" placeholder="海关AEO高级认证企业"></div>
+          <div class="admin-field"><label data-ail="cert4">资质4</label><input type="text" data-key="cert4" id="f-cert4" placeholder="中国对外贸易质量奖"></div>
         </div>
       </div>
     </div>
 
     <!-- ═══ CONTACT PAGE ═══ -->
     <div class="admin-content" id="page-contact" style="display:none">
-      <h2 class="admin-page-title">联系我们页面管理</h2>
+      <h2 class="admin-page-title" data-ail="pageContactTitle">联系我们页面管理</h2>
 
       <div class="admin-card">
-        <h3>页面 Hero 图片</h3>
+        <h3 data-ail="pageHeroImg">页面 Hero 图片</h3>
         <div class="img-editor">
           <img class="img-preview" id="prev-contact.hero" src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=400&q=80">
           <div class="img-controls">
-            <input type="url" id="f-contact.hero" data-img-key="contact.hero" placeholder="图片URL">
-            <div class="or-divider">或</div>
-            <label class="btn btn-secondary upload-btn">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'contact.hero')"></label>
-            <button class="btn btn-sm" onclick="applyImgUrl('contact.hero')">应用URL</button>
+            <input type="url" id="f-contact.hero" data-img-key="contact.hero" data-ail-ph="imgUrl" placeholder="图片URL">
+            <div class="or-divider" data-ail="orDivider">或</div>
+            <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleUpload(this,'contact.hero')"></label>
+            <button class="btn btn-sm" onclick="applyImgUrl('contact.hero')" data-ail="applyUrl">应用URL</button>
           </div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>联系信息</h3>
-        <div class="admin-field"><label>区域标题</label><input type="text" data-key="contact.infoTitle" id="f-contact.infoTitle" placeholder="与我们取得联系"></div>
-        <div class="admin-field"><label>描述文字</label><textarea rows="3" data-key="contact.infoDesc" id="f-contact.infoDesc" placeholder="无论您是寻找优质产品..."></textarea></div>
+        <h3 data-ail="contactInfoCard">联系信息</h3>
+        <div class="admin-field"><label data-ail="contactAreaTitle">区域标题</label><input type="text" data-key="contact.infoTitle" id="f-contact.infoTitle" placeholder="与我们取得联系"></div>
+        <div class="admin-field"><label data-ail="contactDesc">描述文字</label><textarea rows="3" data-key="contact.infoDesc" id="f-contact.infoDesc" placeholder="无论您是寻找优质产品..."></textarea></div>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>公司地址</label><input type="text" data-key="contact.addressVal" id="f-contact.addressVal" placeholder="上海市浦东新区..."></div>
-          <div class="admin-field"><label>联系电话</label><input type="text" data-key="contact.phoneVal" id="f-contact.phoneVal" placeholder="+86 400-888-8888"></div>
-          <div class="admin-field"><label>电子邮件</label><input type="text" data-key="contact.emailVal" id="f-contact.emailVal" placeholder="info@globaltrade.com"></div>
-          <div class="admin-field"><label>工作时间</label><input type="text" data-key="contact.hoursVal" id="f-contact.hoursVal" placeholder="周一至周五 9:00-18:00"></div>
+          <div class="admin-field"><label data-ail="contactAddress">公司地址</label><input type="text" data-key="contact.addressVal" id="f-contact.addressVal" placeholder="上海市浦东新区..."></div>
+          <div class="admin-field"><label data-ail="contactPhone">联系电话</label><input type="text" data-key="contact.phoneVal" id="f-contact.phoneVal" placeholder="+86 400-888-8888"></div>
+          <div class="admin-field"><label data-ail="contactEmail">电子邮件</label><input type="text" data-key="contact.emailVal" id="f-contact.emailVal" placeholder="info@globaltrade.com"></div>
+          <div class="admin-field"><label data-ail="contactHours">工作时间</label><input type="text" data-key="contact.hoursVal" id="f-contact.hoursVal" placeholder="周一至周五 9:00-18:00"></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>社交媒体按钮</h3>
+        <h3 data-ail="socialCard">社交媒体按钮</h3>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>按钮1 文字</label><input type="text" data-key="social.wechat" id="f-social.wechat" placeholder="WeChat"></div>
-          <div class="admin-field"><label>按钮2 文字</label><input type="text" data-key="social.linkedin" id="f-social.linkedin" placeholder="LinkedIn"></div>
-          <div class="admin-field"><label>按钮3 文字</label><input type="text" data-key="social.whatsapp" id="f-social.whatsapp" placeholder="WhatsApp"></div>
+          <div class="admin-field"><label data-ail="social1">按钮1 文字</label><input type="text" data-key="social.wechat" id="f-social.wechat" placeholder="WeChat"></div>
+          <div class="admin-field"><label data-ail="social2">按钮2 文字</label><input type="text" data-key="social.linkedin" id="f-social.linkedin" placeholder="LinkedIn"></div>
+          <div class="admin-field"><label data-ail="social3">按钮3 文字</label><input type="text" data-key="social.whatsapp" id="f-social.whatsapp" placeholder="WhatsApp"></div>
         </div>
       </div>
     </div>
 
     <!-- ═══ SETTINGS ═══ -->
     <div class="admin-content" id="page-settings" style="display:none">
-      <h2 class="admin-page-title">网站全局设置</h2>
+      <h2 class="admin-page-title" data-ail="pageSettingsTitle">网站全局设置</h2>
 
       <!-- Site Default Language — most important setting, shown first -->
       <div class="admin-card" style="border:2px solid #c9a84c">
-        <h3 style="color:#0a1628">🌐 网站默认语言 <small style="color:#aaa;font-weight:normal;font-size:.8rem">（访客第一次打开网站时显示的语言）</small></h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">
-          此设置决定<strong>陌生访客</strong>第一次打开网站看到的语言。访客主动切换语言后，下次打开会保持他自己的选择。
-        </p>
+        <h3 style="color:#0a1628" data-ail="siteLangCard">🌐 网站默认语言</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="siteLangDesc">此设置决定陌生访客第一次打开网站看到的语言。访客主动切换语言后，下次打开会保持他自己的选择。</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
           <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-auto">
             <input type="radio" name="siteDefaultLang" id="siteDefaultLang" value="auto" checked onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
             <div style="font-size:1.5rem">🌍</div>
             <div>
-              <div style="font-weight:700;color:#0a1628">自动识别（推荐）</div>
-              <div style="font-size:.78rem;color:#888">根据访客浏览器语言自动判断<br>中文浏览器→中文，其他→英文</div>
+              <div style="font-weight:700;color:#0a1628" data-ail="langAutoTitle">自动识别（推荐）</div>
+              <div style="font-size:.78rem;color:#888" data-ail="langAutoDesc">根据访客浏览器语言自动判断<br>中文浏览器→中文，其他→英文</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-zh">
             <input type="radio" name="siteDefaultLang" value="zh" onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
             <div style="font-size:1.5rem">🇨🇳</div>
             <div>
-              <div style="font-weight:700;color:#0a1628">默认中文</div>
-              <div style="font-size:.78rem;color:#888">所有访客首次打开显示中文<br>适合主要面向中文市场的网站</div>
+              <div style="font-weight:700;color:#0a1628" data-ail="langZhTitle">默认中文</div>
+              <div style="font-size:.78rem;color:#888" data-ail="langZhDesc">所有访客首次打开显示中文<br>适合主要面向中文市场的网站</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:14px 20px;border:2px solid #ddd;border-radius:10px;cursor:pointer;flex:1;min-width:180px;transition:.2s" id="lbl-en">
             <input type="radio" name="siteDefaultLang" value="en" onchange="document.getElementById('siteDefaultLang').value=this.value" style="display:none">
             <div style="font-size:1.5rem">🇬🇧</div>
             <div>
-              <div style="font-weight:700;color:#0a1628">默认英文</div>
-              <div style="font-size:.78rem;color:#888">所有访客首次打开显示英文<br>适合主要面向英文市场的网站</div>
+              <div style="font-weight:700;color:#0a1628" data-ail="langEnTitle">默认英文</div>
+              <div style="font-size:.78rem;color:#888" data-ail="langEnDesc">所有访客首次打开显示英文<br>适合主要面向英文市场的网站</div>
             </div>
           </label>
         </div>
-        <button class="btn btn-primary" onclick="saveSiteDefaultLang()">保存语言设置</button>
-        <p style="color:#aaa;font-size:.78rem;margin-top:10px">💡 建议：外贸网站通常选「自动识别」——中国客户看中文，海外客户看英文，双方体验最佳。</p>
+        <button class="btn btn-primary" onclick="saveSiteDefaultLang()" data-ail="saveLangBtn">保存语言设置</button>
+        <p style="color:#aaa;font-size:.78rem;margin-top:10px" data-ail="langTip">💡 建议：外贸网站通常选「自动识别」——中国客户看中文，海外客户看英文，双方体验最佳。</p>
       </div>
 
       <div class="admin-card">
-        <h3>品牌 Logo</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">Logo 图片和标题文字二选一：上传图片后将隐藏文字 Logo。<br>浏览器标签页 Favicon 为独立设置，可使用不同图片。</p>
+        <h3 data-ail="logoCard">品牌 Logo</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="logoNote">Logo 图片和标题文字二选一：上传图片后将隐藏文字 Logo。浏览器标签页 Favicon 为独立设置，可使用不同图片。</p>
         <div class="admin-grid-2">
           <div>
-            <div class="admin-field"><label>Logo 文字</label><input type="text" data-key="logo.text" id="f-logo.text" placeholder="GlobalTrade Co."></div>
-            <div class="admin-field"><label>Logo 图片（替代文字 Logo）</label>
+            <div class="admin-field"><label data-ail="logoText">Logo 文字</label><input type="text" data-key="logo.text" id="f-logo.text" placeholder="GlobalTrade Co."></div>
+            <div class="admin-field"><label data-ail="logoImg">Logo 图片（替代文字 Logo）</label>
               <div class="img-editor" style="flex-direction:column">
                 <img class="img-preview" id="prev-logo.image" src="" style="background:#f5f5f5;min-height:60px;object-fit:contain" onerror="this.style.opacity='.2'">
                 <div class="img-controls">
-                  <input type="url" id="f-logo.image" data-img-key="logo.image" placeholder="Logo图片URL（留空使用文字Logo）">
-                  <div class="or-divider">或</div>
-                  <label class="btn btn-secondary upload-btn">上传Logo<input type="file" accept="image/*" onchange="handleUpload(this,'logo.image')"></label>
-                  <button class="btn btn-sm" onclick="applyImgUrl('logo.image')">应用URL</button>
-                  <button class="btn btn-sm" onclick="localStorage.removeItem('edit_img_logo.image');document.getElementById('prev-logo.image').src='';document.getElementById('f-logo.image').value=''" style="background:#fde8e8;color:#c83232">清除Logo图片</button>
+                  <input type="url" id="f-logo.image" data-img-key="logo.image" data-ail-ph="logoImgUrl" placeholder="Logo图片URL（留空使用文字Logo）">
+                  <div class="or-divider" data-ail="orDivider">或</div>
+                  <label class="btn btn-secondary upload-btn" data-ail="uploadLogo">上传Logo<input type="file" accept="image/*" onchange="handleUpload(this,'logo.image')"></label>
+                  <button class="btn btn-sm" onclick="applyImgUrl('logo.image')" data-ail="applyUrl">应用URL</button>
+                  <button class="btn btn-sm" onclick="localStorage.removeItem('edit_img_logo.image');document.getElementById('prev-logo.image').src='';document.getElementById('f-logo.image').value=''" style="background:#fde8e8;color:#c83232" data-ail="clearLogo">清除Logo图片</button>
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <div class="admin-field"><label>浏览器标签页 Favicon <small style="color:#aaa">（独立设置，建议正方形图标）</small></label>
+            <div class="admin-field"><label data-ail="faviconLabel">浏览器标签页 Favicon（独立设置，建议正方形图标）</label>
               <div class="img-editor" style="flex-direction:column">
                 <img class="img-preview" id="prev-site.favicon" src="" style="background:#f5f5f5;width:80px;height:80px;object-fit:contain" onerror="this.style.opacity='.2'">
                 <div class="img-controls">
-                  <input type="url" id="f-site.favicon" data-img-key="site.favicon" placeholder="Favicon图片URL">
-                  <div class="or-divider">或</div>
-                  <label class="btn btn-secondary upload-btn">上传Favicon<input type="file" accept="image/*" onchange="handleUpload(this,'site.favicon')"></label>
-                  <button class="btn btn-sm" onclick="applyImgUrl('site.favicon')">应用URL</button>
+                  <input type="url" id="f-site.favicon" data-img-key="site.favicon" data-ail-ph="faviconUrl" placeholder="Favicon图片URL">
+                  <div class="or-divider" data-ail="orDivider">或</div>
+                  <label class="btn btn-secondary upload-btn" data-ail="uploadFavicon">上传Favicon<input type="file" accept="image/*" onchange="handleUpload(this,'site.favicon')"></label>
+                  <button class="btn btn-sm" onclick="applyImgUrl('site.favicon')" data-ail="applyUrl">应用URL</button>
                 </div>
               </div>
             </div>
@@ -401,23 +400,23 @@
       </div>
 
       <div class="admin-card">
-        <h3>页脚信息</h3>
-        <div class="admin-field"><label>页脚标语</label><input type="text" data-key="footer.tagline" id="f-footer.tagline" placeholder="连接全球，共创价值"></div>
-        <div class="admin-field"><label>版权文字</label><input type="text" data-key="footer.copy" id="f-footer.copy" placeholder="© 2024 GlobalTrade Co."></div>
+        <h3 data-ail="footerCard">页脚信息</h3>
+        <div class="admin-field"><label data-ail="footerTagline">页脚标语</label><input type="text" data-key="footer.tagline" id="f-footer.tagline" placeholder="连接全球，共创价值"></div>
+        <div class="admin-field"><label data-ail="footerCopy">版权文字</label><input type="text" data-key="footer.copy" id="f-footer.copy" placeholder="© 2024 GlobalTrade Co."></div>
         <div class="admin-grid-2">
-          <div class="admin-field"><label>页脚邮箱</label><input type="text" data-key="footer.email" id="f-footer.email" placeholder="✉ info@globaltrade.com"></div>
-          <div class="admin-field"><label>页脚电话</label><input type="text" data-key="footer.phone" id="f-footer.phone" placeholder="📞 +86 400-888-8888"></div>
-          <div class="admin-field" style="grid-column:1/-1"><label>页脚地址</label><input type="text" data-key="footer.address" id="f-footer.address" placeholder="📍 上海市浦东新区..."></div>
+          <div class="admin-field"><label data-ail="footerEmail">页脚邮箱</label><input type="text" data-key="footer.email" id="f-footer.email" placeholder="✉ info@globaltrade.com"></div>
+          <div class="admin-field"><label data-ail="footerPhone">页脚电话</label><input type="text" data-key="footer.phone" id="f-footer.phone" placeholder="📞 +86 400-888-8888"></div>
+          <div class="admin-field" style="grid-column:1/-1"><label data-ail="footerAddress">页脚地址</label><input type="text" data-key="footer.address" id="f-footer.address" placeholder="📍 上海市浦东新区..."></div>
         </div>
       </div>
 
       <div class="admin-card">
-        <h3>数据管理</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:16px">所有内容存储在浏览器本地。建议定期导出备份，换设备或清理浏览器数据后可通过导入恢复。</p>
+        <h3 data-ail="dataCard">数据管理</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="dataNote">所有内容存储在浏览器本地。建议定期导出备份，换设备或清理浏览器数据后可通过导入恢复。</p>
         <div class="data-manage-btns">
-          <button class="btn btn-secondary" onclick="exportData()">📤 导出所有数据 (JSON)</button>
-          <label class="btn btn-secondary">📥 导入数据 (JSON)<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label>
-          <button class="btn btn-danger" onclick="resetData()">🗑 重置为默认数据</button>
+          <button class="btn btn-secondary" onclick="exportData()" data-ail="exportBtn">📤 导出所有数据 (JSON)</button>
+          <label class="btn btn-secondary" data-ail="importBtn">📥 导入数据 (JSON)<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label>
+          <button class="btn btn-danger" onclick="resetData()" data-ail="resetBtn">🗑 重置为默认数据</button>
         </div>
       </div>
     </div>
@@ -425,35 +424,33 @@
 
     <!-- ═══ BUTTONS PAGE ═══ -->
     <div class="admin-content" id="page-buttons" style="display:none">
-      <h2 class="admin-page-title">按钮管理</h2>
+      <h2 class="admin-page-title" data-ail="pageButtonsTitle">按钮管理</h2>
       <div class="admin-card">
-        <h3>全站按钮跳转与动作设置</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:20px">
-          为每个按钮选择点击后的动作：<strong>跳转页面</strong>（从现有页面中选择）或 <strong>发送邮件</strong>（输入邮箱地址，点击后自动打开邮件客户端），或 <strong>外部链接</strong>（输入完整URL）。
-        </p>
+        <h3 data-ail="btnMgmtCard">全站按钮跳转与动作设置</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:20px" data-ail="btnMgmtDesc">为每个按钮选择点击后的动作：跳转页面（从现有页面中选择）或 发送邮件（输入邮箱地址）或 外部链接（输入完整URL）。</p>
         <div id="btnEditorList"></div>
       </div>
       <div style="margin-top:16px">
-        <button class="btn btn-primary" onclick="saveBtnActions()">💾 保存所有按钮设置</button>
+        <button class="btn btn-primary" onclick="saveBtnActions()" data-ail="saveBtnActions">💾 保存所有按钮设置</button>
       </div>
     </div>
 
     <!-- ═══ THEME ═══ -->
     <div class="admin-content" id="page-theme" style="display:none">
-      <h2 class="admin-page-title">主题颜色设置</h2>
+      <h2 class="admin-page-title" data-ail="pageThemeTitle">主题颜色设置</h2>
       <div class="admin-card">
-        <h3>网站主色调</h3>
-        <p style="color:#888;font-size:.85rem;margin-bottom:20px">修改后保存，刷新前台页面即可看到效果。颜色会应用到导航栏、页脚、按钮等全部主色区域。</p>
+        <h3 data-ail="themeCard">网站主色调</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:20px" data-ail="themeNote">修改后保存，刷新前台页面即可看到效果。颜色会应用到导航栏、页脚、按钮等全部主色区域。</p>
         <div class="admin-grid-2">
           <div class="admin-field">
-            <label>主色（深色背景，如导航/页脚）</label>
+            <label data-ail="primaryColorLabel">主色（深色背景，如导航/页脚）</label>
             <div style="display:flex;gap:10px;align-items:center">
               <input type="color" id="themeColorPrimary" value="#0a1628" onchange="applyThemePreview()" style="width:60px;height:42px;border:2px solid #ddd;border-radius:6px;cursor:pointer;padding:2px">
               <input type="text" id="themeColorPrimaryHex" placeholder="#0a1628" style="flex:1;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-size:.9rem" oninput="document.getElementById('themeColorPrimary').value=this.value;applyThemePreview()">
             </div>
           </div>
           <div class="admin-field">
-            <label>强调色（金色按钮、高亮、装饰）</label>
+            <label data-ail="accentColorLabel">强调色（金色按钮、高亮、装饰）</label>
             <div style="display:flex;gap:10px;align-items:center">
               <input type="color" id="themeColorAccent" value="#c9a84c" onchange="applyThemePreview()" style="width:60px;height:42px;border:2px solid #ddd;border-radius:6px;cursor:pointer;padding:2px">
               <input type="text" id="themeColorAccentHex" placeholder="#c9a84c" style="flex:1;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-size:.9rem" oninput="document.getElementById('themeColorAccent').value=this.value;applyThemePreview()">
@@ -464,18 +461,18 @@
           主色 #0a1628 · 强调色 #c9a84c
         </div>
         <div style="display:flex;gap:10px">
-          <button class="btn btn-primary" onclick="saveThemeColors()">💾 保存颜色方案</button>
-          <button class="btn btn-secondary" onclick="resetThemeColors()">↩ 恢复默认颜色</button>
+          <button class="btn btn-primary" onclick="saveThemeColors()" data-ail="saveColorsBtn">💾 保存颜色方案</button>
+          <button class="btn btn-secondary" onclick="resetThemeColors()" data-ail="resetColorsBtn">↩ 恢复默认颜色</button>
         </div>
         <div style="margin-top:24px">
-          <p style="font-size:.85rem;color:#888;margin-bottom:12px">🎨 推荐颜色方案快速选择：</p>
+          <p style="font-size:.85rem;color:#888;margin-bottom:12px" data-ail="presetColorsLabel">🎨 推荐颜色方案快速选择：</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button onclick="setThemePreset('#0a1628','#c9a84c')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#0a1628,#c9a84c);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌊 深海金（默认）</button>
-            <button onclick="setThemePreset('#1a1a2e','#e94560')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1a1a2e,#e94560);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌙 深夜红</button>
-            <button onclick="setThemePreset('#0d3b2e','#f4a261')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#0d3b2e,#f4a261);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌿 森林橙</button>
-            <button onclick="setThemePreset('#1b2a4a','#5e9bdf')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1b2a4a,#5e9bdf);color:#fff;border:none;cursor:pointer;font-size:.82rem">🔵 商务蓝</button>
-            <button onclick="setThemePreset('#2d1b3d','#c77dff')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#2d1b3d,#c77dff);color:#fff;border:none;cursor:pointer;font-size:.82rem">💜 科技紫</button>
-            <button onclick="setThemePreset('#1a1a1a','#00b894')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1a1a1a,#00b894);color:#fff;border:none;cursor:pointer;font-size:.82rem">🖤 黑金绿</button>
+            <button onclick="setThemePreset('#0a1628','#c9a84c')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#0a1628,#c9a84c);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌊 Deep Ocean Gold</button>
+            <button onclick="setThemePreset('#1a1a2e','#e94560')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1a1a2e,#e94560);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌙 Midnight Red</button>
+            <button onclick="setThemePreset('#0d3b2e','#f4a261')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#0d3b2e,#f4a261);color:#fff;border:none;cursor:pointer;font-size:.82rem">🌿 Forest Orange</button>
+            <button onclick="setThemePreset('#1b2a4a','#5e9bdf')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1b2a4a,#5e9bdf);color:#fff;border:none;cursor:pointer;font-size:.82rem">🔵 Corporate Blue</button>
+            <button onclick="setThemePreset('#2d1b3d','#c77dff')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#2d1b3d,#c77dff);color:#fff;border:none;cursor:pointer;font-size:.82rem">💜 Tech Purple</button>
+            <button onclick="setThemePreset('#1a1a1a','#00b894')" style="padding:8px 16px;border-radius:6px;background:linear-gradient(to right,#1a1a1a,#00b894);color:#fff;border:none;cursor:pointer;font-size:.82rem">🖤 Black & Green</button>
           </div>
         </div>
       </div>
@@ -483,14 +480,87 @@
 
     <!-- ═══ PASSWORD ═══ -->
     <div class="admin-content" id="page-password" style="display:none">
-      <h2 class="admin-page-title">修改密码</h2>
+      <h2 class="admin-page-title" data-ail="pagePasswordTitle">修改密码</h2>
       <div class="admin-card" style="max-width:400px">
-        <p style="color:#888;font-size:.85rem;margin-bottom:20px">密码存储在当前浏览器本地。建议设置8位以上、包含字母和数字的密码。</p>
-        <div class="admin-field"><label>当前密码</label><input type="password" id="curPwd"></div>
-        <div class="admin-field"><label>新密码（至少6位）</label><input type="password" id="newPwd"></div>
-        <div class="admin-field"><label>确认新密码</label><input type="password" id="confirmPwd"></div>
-        <button class="btn btn-primary" onclick="changePassword()">修改密码</button>
+        <p style="color:#888;font-size:.85rem;margin-bottom:20px" data-ail="pwdNote">密码存储在当前浏览器本地。建议设置8位以上、包含字母和数字的密码。</p>
+        <div class="admin-field"><label data-ail="curPwdLabel">当前密码</label><input type="password" id="curPwd"></div>
+        <div class="admin-field"><label data-ail="newPwdLabel">新密码（至少6位）</label><input type="password" id="newPwd"></div>
+        <div class="admin-field"><label data-ail="confirmPwdLabel">确认新密码</label><input type="password" id="confirmPwd"></div>
+        <button class="btn btn-primary" onclick="changePassword()" data-ail="changePwdBtn">修改密码</button>
         <div id="pwdMsg" class="admin-msg" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ═══ UPDATE ═══ -->
+    <div class="admin-content" id="page-update" style="display:none">
+      <h2 class="admin-page-title" id="updatePageTitle">检查更新</h2>
+      <div class="admin-card">
+        <h3 id="updateCurrentVerTitle">当前版本 / Current Version</h3>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+          <div style="background:#f0f2f5;padding:12px 24px;border-radius:8px;font-family:monospace;font-size:1.1rem;font-weight:700;color:#0a1628">
+            v0.1
+          </div>
+          <button onclick="checkForUpdates()" id="checkUpdateBtn" class="btn btn-primary">🔍 Check for Updates / 检查更新</button>
+        </div>
+        <div id="updateResult" style="display:none"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>🐳 How to Update (Docker) / Docker 更新方法</h3>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px" data-ail="updateDockerNote">This project runs in Docker. Updates require SSH access to run the commands below. Your site data (site-data.json) is preserved via volume mount.</p>
+
+        <div style="background:#0a1628;border-radius:10px;padding:20px;margin-bottom:16px;position:relative">
+          <div style="color:#c9a84c;font-size:.75rem;font-weight:700;letter-spacing:.1em;margin-bottom:10px" data-ail="sshCmdLabel">SSH Update Command</div>
+          <pre id="updateCmdText" style="color:#e8e8e8;font-family:monospace;font-size:.88rem;line-height:1.8;margin:0;white-space:pre-wrap">cd /opt/1panel/apps/Simple-Business-Websitebuilder
+git pull
+docker compose down
+docker compose build --no-cache
+docker compose up -d
+docker image prune -f</pre>
+          <button onclick="copyUpdateCmd()" style="position:absolute;top:16px;right:16px;padding:6px 14px;background:rgba(201,168,76,0.2);color:#c9a84c;border:1px solid rgba(201,168,76,0.4);border-radius:6px;cursor:pointer;font-size:.8rem;font-family:inherit" id="copyCmdBtn">
+            <span data-ail="copyCmdBtn">📋 复制命令</span>
+          </button>
+        </div>
+
+        <div style="background:#fff3d0;border-radius:8px;padding:14px 18px;border-left:4px solid #c9a84c;margin-bottom:12px">
+          <strong style="color:#8b6914" data-ail="cfWarningTitle">⚠ 如果更新后页面没有变化（Cloudflare 用户）</strong>
+          <p style="color:#7a6020;font-size:.85rem;margin:6px 0 0" data-ail="cfCacheNote">Log in to Cloudflare → your domain → Caching → <strong>Purge Everything</strong>. To prevent this in future, add a Cache Rule to <strong>Bypass cache</strong> for <code>*.js</code> and <code>*.css</code>.</p>
+        </div>
+
+        <div style="background:#e8f4ff;border-radius:8px;padding:14px 18px;border-left:4px solid #5e9bdf">
+          <strong style="color:#1a5276" data-ail="customPathTitle">💡 Custom install path?</strong>
+          <p style="color:#1a5276;font-size:.85rem;margin:6px 0 4px" data-ail="customPathDesc">Replace the first line with your actual install directory:</p>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="customInstallPath" data-ail-ph="customPathPlh" placeholder="/opt/1panel/apps/Simple-Business-Websitebuilder"
+              style="flex:1;min-width:260px;padding:8px 12px;border:1.5px solid #aed6f1;border-radius:6px;font-family:monospace;font-size:.85rem;outline:none">
+            <button onclick="applyCustomPath()" style="padding:8px 16px;background:#1a5276;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:.85rem" data-ail="applyPathBtn">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>📋 Changelog / 更新日志</h3>
+        <div style="border-left:3px solid #c9a84c;padding-left:16px">
+          <div style="margin-bottom:16px">
+            <div style="font-weight:700;color:#0a1628">v0.1 <span style="color:#aaa;font-weight:normal;font-size:.85rem">— First stable release / 首个正式版本</span></div>
+            <ul style="color:#666;font-size:.88rem;margin:8px 0 0 0;padding-left:16px;line-height:1.8">
+              <li>Bilingual content (Chinese / English) stored independently / 中英双语内容独立存储与编辑</li>
+              <li>Auto-detect visitor language / 访客语言自动识别（支持手动切换）</li>
+              <li>Site default language setting (Auto / Chinese / English) / 网站默认语言设置</li>
+              <li>Admin edit language switcher / 管理后台编辑语言切换器</li>
+              <li>api.php backend persistence, changes visible to all visitors / api.php 后端持久化</li>
+              <li>Session token auth + brute-force lockout / Session 令牌验证 + 暴力破解防护</li>
+              <li>Real-time sidebar editor / 实时侧边栏编辑器</li>
+              <li>Theme color editor with 6 presets / 主题颜色编辑器（6套预设方案）</li>
+              <li>Button action manager (page / email / URL) / 按钮动作管理</li>
+              <li>One-click Docker deploy, supports 1Panel / Docker 一键部署，支持 1Panel</li>
+            </ul>
+          </div>
+        </div>
+        <a href="https://github.com/JayMortal/Simple-Business-Websitebuilder/releases" target="_blank"
+          style="display:inline-flex;align-items:center;gap:6px;color:#c9a84c;font-size:.85rem;font-weight:600;text-decoration:none;margin-top:8px" data-ail="viewReleasesLink">
+          查看 GitHub 完整发布历史 →
+        </a>
       </div>
     </div>
 
@@ -541,8 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('site.defaultLang', val);
     if (typeof syncAllToServer === 'function') {
       syncAllToServer(
-        () => showAdminToast('✅ 网站默认语言已保存并同步', 'success'),
-        () => showAdminToast('已保存（服务器同步失败）', 'error')
+        () => showAdminToast(adminLang==='en'?'✅ Default language saved':'✅ 网站默认语言已保存并同步', 'success'),
+        () => showAdminToast(adminLang==='en'?'Saved (sync failed)':'已保存（服务器同步失败）', 'error')
       );
     }
   };
@@ -554,6 +624,80 @@ function setThemePreset(primary, accent) {
   document.getElementById('themeColorAccent').value = accent;
   document.getElementById('themeColorAccentHex').value = accent;
   applyThemePreview();
+}
+
+// ── Update check ─────────────────────────────────────────────────
+const CURRENT_VERSION = 'v0.1';
+const GITHUB_REPO     = 'JayMortal/Simple-Business-Websitebuilder';
+
+function checkForUpdates() {
+  const btn    = document.getElementById('checkUpdateBtn');
+  const result = document.getElementById('updateResult');
+  const isEn   = adminLang === 'en';
+  btn.disabled = true;
+  btn.textContent = isEn ? '🔍 Checking...' : '🔍 检查中...';
+  result.style.display = 'none';
+
+  fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`)
+    .then(r => { if (!r.ok) throw new Error('no release'); return r.json(); })
+    .then(data => {
+      const latest     = data.tag_name || data.name || 'unknown';
+      const releaseUrl = data.html_url || `https://github.com/${GITHUB_REPO}/releases`;
+      const isUpToDate = latest === CURRENT_VERSION;
+      result.style.display = 'block';
+      result.innerHTML = isUpToDate
+        ? `<div style="background:#e0f7ea;border-radius:8px;padding:14px 18px;border-left:4px solid #27ae60;color:#1a7a40;font-weight:600">
+            ✅ ${isEn ? `Already up to date (${CURRENT_VERSION})` : `已是最新版本（${CURRENT_VERSION}）`}
+           </div>`
+        : `<div style="background:#fde8e8;border-radius:8px;padding:14px 18px;border-left:4px solid #c83232">
+            <div style="font-weight:700;color:#c83232;margin-bottom:6px">🔔 ${isEn ? `New version available: ${latest}` : `发现新版本：${latest}`}</div>
+            <div style="color:#666;font-size:.88rem;margin-bottom:10px">${isEn ? `Current: ${CURRENT_VERSION} → Latest: ${latest}` : `当前版本：${CURRENT_VERSION}　→　最新版本：${latest}`}</div>
+            <a href="${releaseUrl}" target="_blank" style="color:#c83232;font-weight:600;font-size:.88rem">${isEn ? 'View release notes →' : '查看更新内容 →'}</a>
+            <div style="color:#888;font-size:.82rem;margin-top:8px">${isEn ? 'Use the SSH Update Command below to upgrade.' : '请使用下方「SSH 更新命令」完成升级'}</div>
+           </div>`;
+    })
+    .catch(() => {
+      result.style.display = 'block';
+      result.innerHTML = isEn
+        ? `<div style="background:#fff3d0;border-radius:8px;padding:14px 18px;border-left:4px solid #c9a84c;color:#8b6914">
+            ⚠ Could not reach GitHub API. <a href="https://github.com/${GITHUB_REPO}/releases" target="_blank" style="color:#c9a84c;font-weight:600"> Click here </a> to check manually.
+           </div>`
+        : `<div style="background:#fff3d0;border-radius:8px;padding:14px 18px;border-left:4px solid #c9a84c;color:#8b6914">
+            ⚠ 无法连接 GitHub API，请<a href="https://github.com/${GITHUB_REPO}/releases" target="_blank" style="color:#c9a84c;font-weight:600"> 点击此处 </a>手动查看最新版本。
+           </div>`;
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = isEn ? '🔍 Check for Updates' : '🔍 检查 GitHub 最新版本';
+    });
+}
+
+function copyUpdateCmd() {
+  const text = document.getElementById('updateCmdText').textContent;
+  const btn  = document.getElementById('copyCmdBtn');
+  const isEn = adminLang === 'en';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = isEn ? '✅ Copied' : '✅ 已复制';
+    setTimeout(() => btn.textContent = isEn ? '📋 Copy' : '📋 复制命令', 2000);
+  }).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    btn.textContent = isEn ? '✅ Copied' : '✅ 已复制';
+    setTimeout(() => btn.textContent = isEn ? '📋 Copy' : '📋 复制命令', 2000);
+  });
+}
+
+function applyCustomPath() {
+  const path  = document.getElementById('customInstallPath').value.trim();
+  if (!path) return;
+  const cmdEl = document.getElementById('updateCmdText');
+  const lines  = cmdEl.textContent.split('\n');
+  lines[0] = 'cd ' + path;
+  cmdEl.textContent = lines.join('\n');
+  showAdminToast(adminLang === 'en' ? '✅ Path updated' : '✅ 路径已更新', 'success');
 }
 </script>
 </body>

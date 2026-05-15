@@ -1,318 +1,200 @@
-# GlobalTrade Co. — International Trade Website Template
+# Simple-Business-Websitebuilder
 
 > 🌐 [中文文档](README_CN.md) | **English**
 
-A fully-featured B2B trade website template with bilingual support (Chinese / English), a visual admin panel, real-time sidebar editor, and one-click Linux VPS deployment. Admin changes are persisted to the server via a lightweight PHP API — visible to all visitors with no database required.
+A lightweight, self-hosted website builder for small businesses — bilingual (Chinese / English), visual admin panel, real-time editor, no database required.
+
+**Live Demo:** [demo.yjggfun.com](https://demo.yjggfun.com)
+
+---
+
+## ✨ Features
+
+| Feature | Detail |
+|---------|--------|
+| 🌐 Bilingual | Chinese / English — auto-detects visitor language |
+| ✏️ Visual Editor | Click any text or image to edit directly on the page |
+| 🗂 Sidebar Editor | Real-time panel — see changes live as you type |
+| ⚙️ Admin Panel | Full content management at `/admin.html` |
+| 🔘 Button Manager | Set each button: page jump / email / external link |
+| 🎨 Theme Colors | Color picker + 6 preset schemes |
+| 🔒 Secure Login | bcrypt password + session tokens + brute-force lockout |
+| 🐳 Docker Ready | One-command deploy, works alongside 1Panel / aaPanel |
+| 📦 No Database | All data stored in a single `site-data.json` file |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-trade-website/
+Simple-Business-Websitebuilder/
 ├── index.html            # Home page
-├── products.html         # Products page (all categories shown vertically)
-├── about.html            # About Us page
-├── contact.html          # Contact Us page
-├── admin.html            # Admin panel — access via /admin.html
-├── api.php               # ★ Backend API: persistent storage, session token auth
+├── products.html         # Products (all categories shown vertically)
+├── about.html            # About Us
+├── contact.html          # Contact Us
+├── admin.html            # Admin panel (/admin.html)
+├── api.php               # Backend API — persistent storage & auth
 ├── css/
-│   ├── style.css         # Main stylesheet + CSS theme variables
-│   └── admin.css         # Admin panel stylesheet
+│   ├── style.css
+│   └── admin.css
 ├── js/
-│   ├── i18n.js           # Bilingual switching (ZH / EN)
-│   ├── main.js           # Core logic, edit mode, logo / favicon, theme, server sync
-│   ├── btn-actions.js    # Button action manager (page jump / email / external URL)
-│   ├── sidebar-editor.js # Real-time sidebar editor with live preview
+│   ├── i18n.js           # Bilingual logic + auto language detection
+│   ├── main.js           # Core logic, edit mode, server sync
+│   ├── admin.js          # Admin panel logic
+│   ├── btn-actions.js    # Button action manager
+│   ├── sidebar-editor.js # Real-time sidebar editor
 │   ├── products-data.js  # Product data store
-│   ├── products.js       # Products page rendering & management
-│   └── admin.js          # Admin panel logic
-├── Dockerfile            # Docker image build file
-├── docker-compose.yml    # Docker Compose configuration
-├── deploy.sh             # Bare-metal one-click deploy script (Nginx + PHP-FPM)
-├── README.md             # This file (English)
+│   └── products.js       # Products page rendering
+├── Dockerfile
+├── docker-compose.yml
+├── deploy.sh             # Bare-metal deploy (Nginx + PHP-FPM)
+├── update.sh             # One-click Docker update script
+├── README.md             # This file
 └── README_CN.md          # Chinese documentation
 ```
 
 ---
 
-## 🔑 How Data Persistence Works
+## 🐳 Option A — Docker Deploy (Recommended for 1Panel / aaPanel)
 
-`api.php` is the project's backend — ~120 lines of PHP, no database:
-
-| Request | Purpose |
-|---------|---------|
-| GET `api.php` | Returns `site-data.json` (front-end pages read this on load) |
-| POST `login` | Verifies bcrypt-hashed password, issues a timed session token |
-| POST `save` | Validates token, writes full site state to `site-data.json` |
-| POST `change_password` | Validates token, updates bcrypt hash, invalidates token |
-| POST `logout` | Server-side token invalidation |
-
-**Flow**: Admin logs in → server issues token → every save pushes data to server → visitors' browsers fetch the latest data from `api.php` on page load.
-
----
-
-## 🚀 Option A: Bare-Metal Deploy (Nginx + PHP-FPM)
-
-### Prerequisites
-
-- Ubuntu 20.04 / 22.04 LTS (or a compatible Debian-based distro)
-- `root` access to the server
-- Domain name already pointed to the server's IP address
-
-### Step 1 — Get the Code onto Your Server
-
-**Option A: Clone from GitHub (recommended)**
-```bash
-git clone https://github.com/your-username/trade-website.git /root/trade-website
-cd /root/trade-website
-```
-
-**Option B: Upload via SCP from your local machine**
-```bash
-scp -r ./trade-website root@your-server-ip:/root/
-```
-
-### Step 2 — Run the Deploy Script
-
-```bash
-cd /root/trade-website
-chmod +x deploy.sh
-
-# HTTP only
-bash deploy.sh yourdomain.com
-
-# HTTP + automatic HTTPS via Let's Encrypt
-bash deploy.sh yourdomain.com --ssl
-```
-
-The script automatically:
-- Installs Nginx and **PHP-FPM** (required to run `api.php`)
-- Copies all site files to `/var/www/globaltrade/`
-- Creates `site-data.json` and `api-state.json` with correct write permissions
-- Writes an optimised Nginx config with PHP support and JSON file protection
-- Opens firewall ports 80 and 443
-- Optionally obtains and configures an SSL certificate
-
-### Step 3 — Done!
-
-| URL | Purpose |
-|-----|---------|
-| `http://yourdomain.com` | Public website |
-| `http://yourdomain.com/admin.html` | Admin panel |
-| Default password | `admin123` — **change this immediately after first login** |
-
----
-
-## 🐳 Option B: Docker Deploy (recommended when 1Panel / aaPanel is already installed)
-
-Panel tools typically occupy ports 80/443 and run their own Nginx/OpenResty, which can conflict with the bare-metal script. Docker isolates the site completely; the panel's reverse proxy feature handles external traffic.
+Panel tools occupy ports 80/443 with their own Nginx. Docker keeps this site fully isolated; the panel's reverse proxy handles external traffic.
 
 ### Prerequisites
 
 ```bash
-# Install Docker
+# Install Docker (skip if already installed)
 curl -fsSL https://get.docker.com | sh
 
-# Install Docker Compose
+# Install Docker Compose plugin (skip if already installed)
 apt-get install -y docker-compose-plugin
 ```
 
-### Step 1 — Get the Code
+### Step 1 — Clone & Initialise
 
 ```bash
-git clone https://github.com/your-username/trade-website.git /root/trade-website
-cd /root/trade-website
-```
+# Clone into your panel's app directory
+git clone https://github.com/JayMortal/Simple-Business-Websitebuilder.git \
+  /opt/1panel/apps/Simple-Business-Websitebuilder
+cd /opt/1panel/apps/Simple-Business-Websitebuilder
 
-### Step 2 — Initialise Data Directory
-
-```bash
+# Create data files and set permissions (www-data UID = 33)
 mkdir -p data
 echo '{}' > data/site-data.json
 echo '{}' > data/api-state.json
+chown 33:33 data/site-data.json data/api-state.json
+chmod 664   data/site-data.json data/api-state.json
 ```
 
-### Step 3 — Start the Container
+> **Why `chown 33:33`?** The Apache process inside the container runs as `www-data` (UID 33). Without this, `api.php` cannot write to the data files and all admin changes will fail to sync.
+
+### Step 2 — Start the Container
 
 ```bash
 docker compose up -d --build
 ```
 
-The container listens on port `14514` (change in `docker-compose.yml` if needed).
-
-### Step 4 — Configure Reverse Proxy in Your Panel
+### Step 3 — Configure Reverse Proxy in Your Panel
 
 **1Panel example:**
-1. Website → Create → choose **Reverse Proxy**
-2. Domain: your domain; Proxy target: `http://127.0.0.1:14514`
-3. Apply SSL via the panel's built-in Let's Encrypt button
+1. Website → Create → **Reverse Proxy**
+2. Domain: `yourdomain.com`
+3. Proxy target: `http://127.0.0.1:14514`
+4. Apply SSL via the panel's built-in Let's Encrypt button
 
-Other panels (aaPanel, BT Panel) work the same — create a reverse proxy site pointing to `127.0.0.1:14514`.
+Same principle applies to aaPanel, BT Panel, and similar tools.
 
-### Common Commands
+### Step 4 — Verify
+
+| URL | Expected result |
+|-----|----------------|
+| `https://yourdomain.com` | Home page loads |
+| `https://yourdomain.com/admin.html` | Login screen appears |
+| Login with `admin123` | Admin panel opens |
+| Edit any text, click Save | ✅ "Saved & synced" toast — change visible to all visitors |
+
+---
+
+## 🖥 Option B — Bare-Metal Deploy (Nginx + PHP-FPM)
+
+For servers **without** Docker or a panel. One script does everything.
 
 ```bash
-docker compose ps          # status
-docker compose logs -f     # live logs
-docker compose down        # stop
-git pull && docker compose up -d --build   # update code (data preserved)
+git clone https://github.com/JayMortal/Simple-Business-Websitebuilder.git
+cd Simple-Business-Websitebuilder
+chmod +x deploy.sh
+
+# HTTP only
+bash deploy.sh yourdomain.com
+
+# HTTP + HTTPS (Let's Encrypt)
+bash deploy.sh yourdomain.com --ssl
 ```
 
-> **Data persistence**: `site-data.json` and `api-state.json` are bind-mounted from `./data/` on the host. Rebuilding or restarting the container never touches these files.
+The script automatically installs Nginx + PHP-FPM, copies all files, sets the correct write permissions on `site-data.json` and `api-state.json`, and configures the Nginx server block.
 
 ---
 
-## ✨ Features
+## 🔄 Updating (Docker)
 
-### Pages
+Use the included `update.sh` — it preserves all your data:
 
-| Page | Content |
-|------|---------|
-| Home | Hero banner, stats bar, advantages section, featured products, CTA |
-| Products | All categories displayed vertically; each with a full product grid |
-| About Us | Company story, mission & values, team profiles, certifications |
-| Contact | Contact info card, inquiry form, social media buttons |
+```bash
+cd /opt/1panel/apps/Simple-Business-Websitebuilder
+bash update.sh
+```
 
-### 🌐 Bilingual Support (Chinese / English)
+**What it does:** `git pull` → stop old container → rebuild image with `--no-cache` → start new container → prune old images.
 
-- One-click language toggle in the top-right header on every page
-- Language preference saved automatically via `localStorage`
-- All admin fields support both Chinese and English input independently
-- Product names, descriptions, and category names each have separate CN / EN fields
+> ⚠️ **Cloudflare users:** After updating, go to CF Dashboard → Caching → **Purge Everything** to clear CDN cache. To avoid this in future, add a Cache Rule to **Bypass cache** for `*.js` and `*.css` files.
 
-### ✏️ Inline Edit Mode
+---
 
-After logging into the admin panel, all front-end pages enter **edit mode**:
-- Every text element becomes directly editable — click to type, changes save automatically
-- Every image shows a click-to-replace overlay — paste a URL or upload a local file
-- A floating toolbar at the bottom provides **Save**, **Sidebar Editor**, **Admin Panel**, and **Exit** controls
+## ⚙️ Admin Panel Guide
 
-### 🗂 Real-Time Sidebar Editor
+### Step 1 — Set the Site Default Language
 
-Click **"Sidebar Editor"** in the edit-mode toolbar to open a slide-in panel on the left:
-- All editable fields for the current page are listed and grouped by section automatically
-- Text changes appear instantly on the live page behind the panel
-- Image fields support URL input, local upload, and instant thumbnail preview
-- Language can be switched inside the panel
-- **Save** and **Cancel** each require a confirmation dialog to prevent accidental changes
+Go to **Site Settings** and choose how first-time visitors see the site:
 
-### ⚙️ Admin Panel (`/admin.html`)
-
-| Section | What you can manage |
-|---------|---------------------|
-| Home | Hero text & background image, stats bar numbers, advantages, featured products, CTA |
-| Products | Add / rename / delete categories (minimum 1); add / edit / delete products (minimum 1 per category); CN + EN content; image via URL or upload |
-| About Us | Story text & image, mission / vision / values, team member profiles, certifications |
-| Contact | Contact details, working hours, social media button labels |
-| **Button Manager** | Per-button action: page jump (dropdown), send email (enter address only), external URL, or no action |
-| Site Settings | Logo text, logo image (replaces text logo when set), browser favicon (independent setting), footer text |
-| Theme Colors | Primary + accent color pickers, hex input, live gradient preview, 6 preset schemes |
-| Change Password | Requires current password; minimum 6 characters |
-| Data Management | Export all data as a JSON backup; import from JSON; reset everything to defaults |
-
-### 🔘 Button Action Manager
-
-Every configurable button can independently be set to one of four actions:
-
-| Action | Behaviour |
+| Option | Behaviour |
 |--------|-----------|
-| 📄 Page Jump | Select a destination from a dropdown of existing pages — no URL typing required |
-| ✉️ Send Email | Enter an email address; the button generates the `mailto:` link automatically |
-| 🔗 External Link | Enter a full URL; opens in a new tab |
-| 🚫 No Action | Decorative button with no click behaviour |
+| 🌍 Auto-detect *(recommended)* | Chinese browser → Chinese; all others → English |
+| 🇨🇳 Chinese | All first-time visitors see Chinese |
+| 🇬🇧 English | All first-time visitors see English |
 
-Buttons covered: Hero Button 1 & 2, "View All Products", CTA button, WeChat / LinkedIn / WhatsApp social buttons, and the inquiry form submit button.
+Visitors who manually switch the language will always see their chosen language on return visits.
 
-### 🔒 Brute-Force Login Protection
+### Step 2 — Edit Bilingual Content
 
-- 5 consecutive failed password attempts lock the admin login for **15 minutes**
-- A real-time countdown timer is displayed during the lockout period
-- The login button is disabled while the account is locked
-- The attempt counter resets automatically once the lockout expires
+The left sidebar has two independent language controls:
 
-### 🎨 Theme Color Editor
-
-- Color picker and hex input for both primary and accent colors
-- Live gradient preview updates in real time as you choose
-- Six built-in presets: Deep Ocean Gold (default), Midnight Red, Forest Orange, Corporate Blue, Tech Purple, Black & Green
-- Colors are applied via CSS custom properties — the entire site updates after a page refresh
-
-### 🖼 Logo & Favicon
-
-- **Logo image**: upload an image to replace the default text logo on all pages
-- **Browser favicon**: independent setting — can use a different image from the logo
-- Clearing the logo image automatically restores the text logo
-
----
-
-## 🔧 Customisation
-
-### Change the Admin Password
-
-Admin Panel → Change Password (in the left sidebar)
-
-### Customise Theme Colors via Code
-
-Edit the CSS variables at the top of `css/style.css`:
-
-```css
-:root {
-  --navy: #0a1628;   /* Primary color — dark backgrounds (header, footer) */
-  --gold: #c9a84c;   /* Accent color — buttons, highlights, decorations */
-}
+```
+🌐 UI Language      [中文] [English]   ← language of the admin interface itself
+✏️ Edit Language    [中文] [English]   ← which language's front-end content you're editing
 ```
 
-Or use the **Theme Colors** page in the admin panel — no code editing required.
+**Recommended workflow:**
+1. Set Edit Language → **中文** → fill in all Chinese content → **Save**
+2. Set Edit Language → **English** → fill in all English content → **Save**
+3. Front-end visitors automatically see content in the correct language
 
-### Data Persistence
+### Step 3 — Change the Admin Password
 
-All content is stored in the browser's `localStorage` (fully client-side, no server or database required).
+Admin Panel → left sidebar → **Change Password**. Do this immediately after first login.
 
-- Use **Export Data** in the admin panel to download a JSON backup file
-- Use **Import Data** to restore content on a new device or after clearing browser data
-- For server-side persistence, integrate a lightweight Node.js or PHP endpoint to write the exported JSON to disk
+### Data Backup & Restore
 
----
-
-## 📌 Nginx Configuration Notes
-
-The deploy script writes `/etc/nginx/sites-available/globaltrade` with the following included:
-
-- **Gzip compression** for CSS, JS, HTML, SVG, and JSON
-- **30-day browser cache** for all static assets (`Cache-Control: public, immutable`)
-- **Security headers**: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy`
-- **Commented-out IP allowlist** for `/admin.html` — uncomment to restrict admin access by IP address
-- Access and error logs at `/var/log/nginx/globaltrade_access.log` and `globaltrade_error.log`
+- **Export:** Site Settings → Export Data (downloads a `.json` backup)
+- **Import:** Site Settings → Import Data (restores from a previous backup)
+- **Reset:** Site Settings → Reset to Defaults (clears all custom content)
 
 ---
 
-## 🔒 Security Recommendations
+## 🔒 Security Notes
 
 1. **Change the default password** `admin123` immediately after first login
-2. Restrict `/admin.html` to trusted IP addresses by uncommenting the allowlist block in the Nginx config
-3. Always serve the site over HTTPS — use the `--ssl` flag when running `deploy.sh`
-4. Export and store a JSON data backup regularly via the admin panel
-
----
-
-## 🔄 Updating the Site After Code Changes
-
-```bash
-# Local machine — commit and push
-git add .
-git commit -m "update: describe what changed"
-git push
-
-# VPS — pull and sync
-ssh root@your-server-ip
-cd /root/trade-website
-git pull
-cp -r *.html css js /var/www/globaltrade/
-systemctl reload nginx
-```
-
-> **Tip:** To skip the manual `cp` step on every update, change `SITE_DIR` in `deploy.sh` to `/root/trade-website` before running it. Nginx will then serve files directly from the Git repository directory, so `git pull` alone is enough to update the live site.
+2. **Always use HTTPS** — enable with the `--ssl` flag or via your panel
+3. To restrict admin access by IP, uncomment the `allow` block in the Nginx config
+4. Login is protected server-side: **5 failed attempts → 15-minute lockout**
 
 ---
 
@@ -320,12 +202,12 @@ systemctl reload nginx
 
 | Item | Detail |
 |------|--------|
-| Total files | 15 (7 HTML/CSS, 7 JS, 1 shell script) |
-| Zip archive size | ~68 KB |
-| External dependencies | Google Fonts via CDN (optional — can be self-hosted) |
-| Backend required | None — 100% static files |
-| Minimum server spec | 1 vCPU / 512 MB RAM (any basic VPS) |
+| Version | v0.1 |
+| Backend | PHP 8.2, no database |
+| Deploy options | Docker (recommended), Nginx + PHP-FPM (bare-metal) |
+| Minimum server spec | 1 vCPU / 512 MB RAM |
+| External dependencies | Google Fonts via CDN (optional) |
 
 ---
 
-*Built with ❤️ — GlobalTrade Website Template v3.0*
+*[Simple-Business-Websitebuilder](https://github.com/JayMortal/Simple-Business-Websitebuilder) v0.1*

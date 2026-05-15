@@ -28,13 +28,13 @@ window.openSidebarEditor = function() {
       <!-- Panel Header -->
       <div style="background:#0a1628;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
         <div>
-          <div style="color:#c9a84c;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">实时编辑器</div>
-          <div style="color:#fff;font-weight:700;font-size:1rem">当前页面内容</div>
+          <div style="color:#c9a84c;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${window.localStorage.getItem('adminLang')==='en'?'Live Editor':'实时编辑器'}</div>
+          <div style="color:#fff;font-weight:700;font-size:1rem">${window.localStorage.getItem('adminLang')==='en'?'Page Content':'当前页面内容'}</div>
         </div>
         <div style="display:flex;gap:6px">
           <select id="sidebarLang" onchange="sidebarSwitchLang(this.value)" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:.82rem;cursor:pointer">
-            <option value="zh" ${window.currentLang==='zh'?'selected':''}>中文</option>
-            <option value="en" ${window.currentLang==='en'?'selected':''}>EN</option>
+            <option value="zh" ${window.currentLang==='zh'?'selected':''}>${window.localStorage.getItem('adminLang')==='en'?'Chinese':'中文'}</option>
+            <option value="en" ${window.currentLang==='en'?'selected':''}>${window.localStorage.getItem('adminLang')==='en'?'English':'英文'}</option>
           </select>
         </div>
       </div>
@@ -42,7 +42,7 @@ window.openSidebarEditor = function() {
       <!-- Live indicator -->
       <div style="background:#1a3358;padding:8px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0">
         <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block;animation:sbPulse 2s infinite"></span>
-        <span style="color:rgba(255,255,255,.7);font-size:.8rem">修改实时显示在页面中</span>
+        <span style="color:rgba(255,255,255,.7);font-size:.8rem">${window.localStorage.getItem('adminLang')==='en'?'Changes appear on page instantly':'修改实时显示在页面中'}</span>
       </div>
 
       <!-- Fields scroll area -->
@@ -50,8 +50,8 @@ window.openSidebarEditor = function() {
 
       <!-- Action footer -->
       <div style="border-top:1px solid #eee;padding:16px 20px;display:flex;gap:10px;flex-shrink:0;background:#fafafa">
-        <button onclick="sidebarCancel()" style="flex:1;padding:11px;background:#f0f2f5;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:600;color:#555">✕ 取消</button>
-        <button onclick="sidebarSave()" style="flex:2;padding:11px;background:#c9a84c;color:#0a1628;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:700">💾 保存更改</button>
+        <button onclick="sidebarCancel()" style="flex:1;padding:11px;background:#f0f2f5;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:600;color:#555">✕ ${window.localStorage.getItem('adminLang')==='en'?'Cancel':'取消'}</button>
+        <button onclick="sidebarSave()" style="flex:2;padding:11px;background:#c9a84c;color:#0a1628;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:700">💾 ${window.localStorage.getItem('adminLang')==='en'?'Save Changes':'保存更改'}</button>
       </div>
     </div>
 
@@ -110,13 +110,13 @@ function gatherEditableFields() {
     // Find nearest section title
     let sectionName = getSectionName(el);
     if (sectionName !== curSection) {
-      if (curItems.length) sections.push({ title: curSection || '内容', items: curItems });
+      if (curItems.length) sections.push({ title: curSection || (window.localStorage.getItem('adminLang')==='en'?'Content':'内容'), items: curItems });
       curSection = sectionName;
       curItems = [];
     }
     curItems.push({ key, type: textKey ? 'text' : 'img', el, label: getLabelFor(key) });
   });
-  if (curItems.length) sections.push({ title: curSection || '内容', items: curItems });
+  if (curItems.length) sections.push({ title: curSection || (window.localStorage.getItem('adminLang')==='en'?'Content':'内容'), items: curItems });
   return sections;
 }
 
@@ -128,39 +128,44 @@ function getSectionName(el) {
     const h = node.querySelector('h1,h2,h3,.section-tag,.cat-title');
     if (h && h !== el) return h.textContent.trim().slice(0,20) || '—';
     const cls = node.className || '';
-    if (cls.includes('hero')) return '横幅区域';
-    if (cls.includes('stats')) return '统计数字';
-    if (cls.includes('feature')) return '特色优势';
-    if (cls.includes('footer')) return '页脚';
-    if (cls.includes('cta')) return 'CTA 横幅';
-    if (cls.includes('about-story')) return '公司故事';
-    if (cls.includes('mission')) return '使命价值观';
-    if (cls.includes('team')) return '团队介绍';
-    if (cls.includes('cert')) return '荣誉资质';
-    if (cls.includes('contact')) return '联系信息';
+    const isEn = window.localStorage.getItem('adminLang')==='en';
+    if (cls.includes('hero')) return isEn?'Hero Banner':'横幅区域';
+    if (cls.includes('stats')) return isEn?'Stats':'统计数字';
+    if (cls.includes('feature')) return isEn?'Advantages':'特色优势';
+    if (cls.includes('footer')) return isEn?'Footer':'页脚';
+    if (cls.includes('cta')) return isEn?'CTA Banner':'CTA 横幅';
+    if (cls.includes('about-story')) return isEn?'Company Story':'公司故事';
+    if (cls.includes('mission')) return isEn?'Mission & Values':'使命价值观';
+    if (cls.includes('team')) return isEn?'Team':'团队介绍';
+    if (cls.includes('cert')) return isEn?'Certifications':'荣誉资质';
+    if (cls.includes('contact')) return isEn?'Contact':'联系信息';
     node = node.parentElement;
   }
-  return '其他内容';
+  return window.localStorage.getItem('adminLang')==='en'?'Other Content':'其他内容';
 }
 
 const labelMap = {
-  'logo.text':'Logo文字','footer.tagline':'页脚标语','footer.copy':'版权信息',
-  'footer.email':'邮箱','footer.phone':'电话','footer.address':'地址',
-  'hero.tag':'标签文字','hero.title':'主标题','hero.desc':'副标题',
-  'hero.btn1':'按钮1文字','hero.btn2':'按钮2文字',
-  'hero.image':'横幅背景图','cta.image':'CTA背景图','about.story':'故事配图',
-  'about.storyTitle':'故事标题','about.storyP1':'段落1','about.storyP2':'段落2','about.storyP3':'段落3',
-  'about.visionText':'愿景文字','about.missionText':'使命文字','about.valuesText':'价值观文字',
-  'cta.title':'CTA标题','cta.desc':'CTA描述','cta.btn':'CTA按钮',
-  'contact.infoTitle':'联系标题','contact.infoDesc':'联系描述',
-  'contact.addressVal':'地址详情','contact.phoneVal':'电话详情','contact.emailVal':'邮箱详情','contact.hoursVal':'工作时间',
-  'products.heroTitle':'产品页标题','products.heroSub':'产品页副标题',
-  'about.heroTitle':'关于我们标题','about.heroSub':'关于我们副标题',
-  'contact.heroTitle':'联系我们标题','contact.heroSub':'联系我们副标题',
+  'logo.text':{zh:'Logo文字',en:'Logo Text'},'footer.tagline':{zh:'页脚标语',en:'Footer Tagline'},'footer.copy':{zh:'版权信息',en:'Copyright'},
+  'footer.email':{zh:'邮箱',en:'Email'},'footer.phone':{zh:'电话',en:'Phone'},'footer.address':{zh:'地址',en:'Address'},
+  'hero.tag':{zh:'标签文字',en:'Tag Text'},'hero.title':{zh:'主标题',en:'Headline'},'hero.desc':{zh:'副标题',en:'Subheadline'},
+  'hero.btn1':{zh:'按钮1文字',en:'Button 1 Text'},'hero.btn2':{zh:'按钮2文字',en:'Button 2 Text'},
+  'hero.image':{zh:'横幅背景图',en:'Hero Background'},'cta.image':{zh:'CTA背景图',en:'CTA Background'},'about.story':{zh:'故事配图',en:'Story Image'},
+  'about.storyTitle':{zh:'故事标题',en:'Story Headline'},'about.storyP1':{zh:'段落1',en:'Paragraph 1'},'about.storyP2':{zh:'段落2',en:'Paragraph 2'},'about.storyP3':{zh:'段落3',en:'Paragraph 3'},
+  'about.visionText':{zh:'愿景文字',en:'Vision Text'},'about.missionText':{zh:'使命文字',en:'Mission Text'},'about.valuesText':{zh:'价值观文字',en:'Values Text'},
+  'cta.title':{zh:'CTA标题',en:'CTA Title'},'cta.desc':{zh:'CTA描述',en:'CTA Description'},'cta.btn':{zh:'CTA按钮',en:'CTA Button'},
+  'contact.infoTitle':{zh:'联系标题',en:'Contact Title'},'contact.infoDesc':{zh:'联系描述',en:'Contact Description'},
+  'contact.addressVal':{zh:'地址详情',en:'Address'},'contact.phoneVal':{zh:'电话详情',en:'Phone'},'contact.emailVal':{zh:'邮箱详情',en:'Email'},'contact.hoursVal':{zh:'工作时间',en:'Hours'},
+  'products.heroTitle':{zh:'产品页标题',en:'Products Title'},'products.heroSub':{zh:'产品页副标题',en:'Products Subtitle'},
+  'about.heroTitle':{zh:'关于我们标题',en:'About Title'},'about.heroSub':{zh:'关于我们副标题',en:'About Subtitle'},
+  'contact.heroTitle':{zh:'联系我们标题',en:'Contact Title'},'contact.heroSub':{zh:'联系我们副标题',en:'Contact Subtitle'},
 };
 
 function getLabelFor(key) {
-  if (labelMap[key]) return labelMap[key];
+  if (labelMap[key]) {
+    const lm = labelMap[key];
+    const isEn = window.localStorage.getItem('adminLang') === 'en';
+    return typeof lm === 'object' ? (isEn ? lm.en : lm.zh) : lm;
+  }
   return key.replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 }
 
@@ -190,14 +195,14 @@ function renderSidebarFields(sections) {
         field.innerHTML = `<label class="sb-label">${item.label}</label>
           <div class="sb-img-wrap">
             <img id="sbprev_${item.key.replace(/\./g,'_')}" src="${curSrc}" onerror="this.style.opacity='.3'">
-            <div class="sb-img-overlay"><span>点击预览区域<br>或填写URL / 上传</span></div>
+            <div class="sb-img-overlay"><span>${window.localStorage.getItem('adminLang')==='en'?'Click to preview<br>or enter URL / upload':'点击预览区域<br>或填写URL / 上传'}</span></div>
           </div>
           <div class="sb-img-row">
-            <input type="url" data-sbkey="${item.key}" data-type="img" placeholder="图片URL" value="${curSrc}">
+            <input type="url" data-sbkey="${item.key}" data-type="img" placeholder="${window.localStorage.getItem('adminLang')==='en'?'Image URL':'图片URL'}" value="${curSrc}">
           </div>
           <div class="sb-img-btns">
-            <button onclick="sbApplyUrl('${item.key}')">应用URL</button>
-            <label>📤 上传<input type="file" accept="image/*" style="display:none" onchange="sbHandleUpload(this,'${item.key}')"></label>
+            <button onclick="sbApplyUrl('${item.key}')">${window.localStorage.getItem('adminLang')==='en'?'Apply URL':'应用URL'}</button>
+            <label>📤 ${window.localStorage.getItem('adminLang')==='en'?'Upload':'上传'}<input type="file" accept="image/*" style="display:none" onchange="sbHandleUpload(this,'${item.key}')"></label>
           </div>`;
       }
       secEl.appendChild(field);
@@ -234,17 +239,22 @@ window.sbHandleUpload = function(input, key) {
 };
 
 window.sidebarSwitchLang = function(lang) {
-  if (window.applyTranslations) applyTranslations(lang);
-  document.dispatchEvent(new CustomEvent('langChanged'));
-  // Re-gather fields after lang switch
+  // This switches which language's stored content is loaded into the sidebar fields.
+  // It also switches the visitor-facing page to the same language so the admin
+  // always edits the language they are actually looking at.
+  window.currentLang = lang;
+  localStorage.setItem('lang', lang);
+  // ✅ Sync page translations so the page behind the sidebar matches the edit language
+  if (window.applyTranslations) window.applyTranslations(lang);
+  // Re-gather and render fields with the new language's stored values
   setTimeout(() => {
     const fields = gatherEditableFields();
     renderSidebarFields(fields);
-  }, 100);
+  }, 50);
 };
 
 window.sidebarSave = function() {
-  if (!confirm('确定保存所有更改吗？\n\n保存后内容将立即生效。')) return;
+  if (!confirm(window.localStorage.getItem('adminLang')==='en'?'Save all changes? They will take effect immediately.':'确定保存所有更改吗？\n\n保存后内容将立即生效。')) return;
 
   // Save text fields with lang-prefixed keys
   document.querySelectorAll('#sidebarFields [data-sbkey]').forEach(input => {
@@ -267,18 +277,19 @@ window.sidebarSave = function() {
 
   closeSidebar();
   // Sync to server after saving
+  const isEn = window.localStorage.getItem('adminLang') === 'en';
   if (window.syncToServer) {
     window.syncToServer(
-      () => showSiteToast('✅ 页面内容已保存并同步！'),
-      () => showSiteToast('✅ 已保存（服务器同步失败）')
+      () => showSiteToast(isEn ? '✅ Saved & synced!' : '✅ 页面内容已保存并同步！'),
+      () => showSiteToast(isEn ? '✅ Saved locally (server sync failed)' : '✅ 已保存（服务器同步失败）')
     );
   } else {
-    showSiteToast('✅ 页面内容已保存！');
+    showSiteToast(isEn ? '✅ Saved!' : '✅ 页面内容已保存！');
   }
 };
 
 window.sidebarCancel = function() {
-  if (!confirm('确定放弃所有未保存的更改？\n\n页面内容将恢复到编辑前的状态。')) return;
+  if (!confirm(window.localStorage.getItem('adminLang')==='en'?'Discard all unsaved changes? Content will revert to its previous state.':'确定放弃所有未保存的更改？\n\n页面内容将恢复到编辑前的状态。')) return;
 
   // Restore snapshot
   const snap = window._sbSnapshot || {};
