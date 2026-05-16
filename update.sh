@@ -5,8 +5,14 @@
 # ============================================================
 # Usage / 用法: bash update.sh
 #
-# Safe: site-data.json and api-state.json are preserved.
-# 安全：site-data.json 和 api-state.json 的数据不会丢失。
+# Safe: data/site-data.json is preserved via Docker volume.
+# 安全：data/site-data.json 通过 Docker volume 挂载，数据不会丢失。
+#
+# After update / 更新后:
+#   Browser cache is NOT an issue — the server sends
+#   Cache-Control: no-cache on all HTML files.
+#   无需担心浏览器缓存——服务器对所有 HTML 文件
+#   发送 Cache-Control: no-cache 头，强制浏览器每次重新加载。
 # ============================================================
 
 set -e
@@ -18,7 +24,7 @@ cd "$SCRIPT_DIR"
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════════╗"
-echo "║   Simple-Business-Websitebuilder  Updater v0.1  ║"
+echo "║   Simple-Business-Websitebuilder  Updater v0.2  ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo -e "${NC}"
 

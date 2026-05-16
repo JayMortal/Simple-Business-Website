@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="adminPageTitle">管理后台 | GlobalTrade Admin</title>
+  <title id="adminPageTitle">Admin Panel</title>
+  <!-- Language detection runs before any render to prevent wrong-language flash -->
+  <script>
+    (function(){
+      var stored = localStorage.getItem('adminLang');
+      if (!stored) {
+        var browser = (navigator.language || navigator.userLanguage || '').toLowerCase();
+        stored = browser.startsWith('zh') ? 'zh' : 'en';
+        localStorage.setItem('adminLang', stored);
+      }
+      document.documentElement.lang = stored === 'zh' ? 'zh-CN' : 'en';
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -13,19 +25,19 @@
 <!-- LOGIN OVERLAY -->
 <div class="admin-login-overlay" id="loginOverlay">
   <div class="admin-login-box">
-    <div class="login-logo"><span class="logo-icon">⬡</span><span>GlobalTrade Admin</span></div>
-    <h2 id="loginTitle">管理后台登录</h2>
-    <p class="login-sub" id="loginSub">请输入管理员密码以进入编辑模式</p>
+    <div class="login-logo"><span class="logo-icon">⬡</span><span>Admin Panel</span></div>
+    <h2 id="loginTitle"></h2>
+    <p class="login-sub" id="loginSub"></p>
     <div class="form-group" style="text-align:left">
-      <label id="loginPwdLabel">管理员密码</label>
-      <input type="password" id="adminPassword" placeholder="请输入密码">
+      <label id="loginPwdLabel"></label>
+      <input type="password" id="adminPassword" placeholder="">
     </div>
-    <button id="loginBtn" class="btn btn-primary btn-full" onclick="doLogin()">登 录</button>
-    <p class="login-hint" id="loginHint">默认密码：<code>admin123</code>（登录后请立即修改）</p>
+    <button id="loginBtn" class="btn btn-primary btn-full" onclick="doLogin()"></button>
+    <p class="login-hint" id="loginHint"></p>
     <div class="login-error" id="loginError"></div>
     <div class="login-error" id="lockoutMsg" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;display:none;padding:10px;border-radius:6px;margin-top:12px;font-size:.85rem"></div>
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
-      <p style="color:#bbb;font-size:.78rem;text-align:center" id="loginErrLockMsg">🔒 连续 5 次错误将锁定 15 分钟</p>
+      <p style="color:#bbb;font-size:.78rem;text-align:center" id="loginErrLockMsg"></p>
     </div>
   </div>
 </div>
@@ -42,40 +54,38 @@
 
     <!-- Edit Language Switcher (which language content is being edited) -->
     <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.15)">
-      <div style="font-size:.72rem;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px" id="editLangLabel">编辑语言</div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px" id="editLangLabel" data-ail="editLang"></div>
       <div style="display:flex;gap:6px;margin-bottom:8px">
         <button onclick="switchEditLang('zh')" id="editLangZh"
           style="flex:1;padding:7px 8px;border-radius:6px;border:1.5px solid #c9a84c;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;background:#c9a84c;color:#0a1628;transition:.2s">
-          🇨🇳 中文
+          🇨🇳 Chinese
         </button>
         <button onclick="switchEditLang('en')" id="editLangEn"
           style="flex:1;padding:7px 8px;border-radius:6px;border:1.5px solid #444;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;background:transparent;color:#888;transition:.2s">
           🇬🇧 English
         </button>
       </div>
-      <div id="editLangIndicator" style="font-size:.75rem;padding:5px 10px;border-radius:4px;text-align:center;background:#fff3d0;color:#8b6914;font-weight:600">
-        正在编辑：中文内容
-      </div>
-      <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.4" id="editLangHint">右侧编辑的是该语言的前台内容</div>
+      <div id="editLangIndicator" style="font-size:.75rem;padding:5px 10px;border-radius:4px;text-align:center;background:#fff3d0;color:#8b6914;font-weight:600"></div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.4" id="editLangHint" data-ail="editLangHint"></div>
     </div>
 
     <nav class="sidebar-nav">
-      <div class="sidebar-section-label" data-ail="secPages">页面内容</div>
-      <a href="#" class="sidebar-link active" onclick="switchPage('home')">🏠 首页</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('products')">📦 产品介绍</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('about')">👥 关于我们</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('contact')">✉ 联系我们</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('buttons')">🔘 按钮管理</a>
-      <div class="sidebar-section-label" style="margin-top:16px" data-ail="secSystem">系统设置</div>
-      <a href="#" class="sidebar-link" onclick="switchPage('settings')">⚙ 网站设置</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('theme')">🎨 主题颜色</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('password')">🔒 修改密码</a>
-      <a href="#" class="sidebar-link" onclick="switchPage('update')">🔄 检查更新</a>
+      <div class="sidebar-section-label" data-ail="secPages"></div>
+      <a href="#" class="sidebar-link active" onclick="switchPage('home')" data-ail-nav="home">🏠</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('products')" data-ail-nav="products">📦</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('about')" data-ail-nav="about">👥</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('contact')" data-ail-nav="contact">✉</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('buttons')" data-ail-nav="buttons">🔘</a>
+      <div class="sidebar-section-label" style="margin-top:16px" data-ail="secSystem"></div>
+      <a href="#" class="sidebar-link" onclick="switchPage('settings')" data-ail-nav="settings">⚙</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('theme')" data-ail-nav="theme">🎨</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('password')" data-ail-nav="password">🔒</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('update')" data-ail-nav="update">🔄</a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="btn-logout" id="logoutBtn" onclick="doLogout()">退出登录</button>
-      <div class="sidebar-version">v0.1</div>
+      <button class="btn-logout" id="logoutBtn" onclick="doLogout()" data-ail="logoutBtn"></button>
+      <div class="sidebar-version">v0.2</div>
     </div>
   </aside>
 
@@ -498,7 +508,7 @@
         <h3 id="updateCurrentVerTitle">当前版本 / Current Version</h3>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
           <div style="background:#f0f2f5;padding:12px 24px;border-radius:8px;font-family:monospace;font-size:1.1rem;font-weight:700;color:#0a1628">
-            v0.1
+            v0.2
           </div>
           <button onclick="checkForUpdates()" id="checkUpdateBtn" class="btn btn-primary">🔍 Check for Updates / 检查更新</button>
         </div>
@@ -541,15 +551,23 @@ docker image prune -f</pre>
       <div class="admin-card">
         <h3>📋 Changelog / 更新日志</h3>
         <div style="border-left:3px solid #c9a84c;padding-left:16px">
+          <div style="margin-bottom:20px">
+            <div style="font-weight:700;color:#0a1628">v0.2 <span style="color:#aaa;font-weight:normal;font-size:.85rem">— Backend rewrite / 后端重构</span></div>
+            <ul style="color:#666;font-size:.88rem;margin:8px 0 0 0;padding-left:16px;line-height:1.8">
+              <li>Backend migrated from PHP to Node.js + Express / 后端从 PHP 迁移至 Node.js + Express</li>
+              <li>Auth replaced with express-session httpOnly cookie / 认证改为 express-session httpOnly Cookie，彻底解决同步失败问题</li>
+              <li>HTML served with Cache-Control: no-cache — no more stale pages after update / 服务器对 HTML 强制 no-cache，更新后浏览器立即加载新版本</li>
+              <li>Admin panel auto-detects browser language on first visit / 管理后台首次访问自动检测浏览器语言，英文用户不再看到中文</li>
+              <li>Docker volume now mounts only data/ — no chown workarounds needed / Docker volume 只挂载 data/ 目录，无需 chown 权限修复</li>
+              <li>Environment config via .env file (ADMIN_PASSWORD, SESSION_SECRET) / 通过 .env 文件配置初始密码和 Session 密钥</li>
+            </ul>
+          </div>
           <div style="margin-bottom:16px">
             <div style="font-weight:700;color:#0a1628">v0.1 <span style="color:#aaa;font-weight:normal;font-size:.85rem">— First stable release / 首个正式版本</span></div>
             <ul style="color:#666;font-size:.88rem;margin:8px 0 0 0;padding-left:16px;line-height:1.8">
               <li>Bilingual content (Chinese / English) stored independently / 中英双语内容独立存储与编辑</li>
               <li>Auto-detect visitor language / 访客语言自动识别（支持手动切换）</li>
               <li>Site default language setting (Auto / Chinese / English) / 网站默认语言设置</li>
-              <li>Admin edit language switcher / 管理后台编辑语言切换器</li>
-              <li>api.php backend persistence, changes visible to all visitors / api.php 后端持久化</li>
-              <li>Session token auth + brute-force lockout / Session 令牌验证 + 暴力破解防护</li>
               <li>Real-time sidebar editor / 实时侧边栏编辑器</li>
               <li>Theme color editor with 6 presets / 主题颜色编辑器（6套预设方案）</li>
               <li>Button action manager (page / email / URL) / 按钮动作管理</li>
@@ -627,7 +645,7 @@ function setThemePreset(primary, accent) {
 }
 
 // ── Update check ─────────────────────────────────────────────────
-const CURRENT_VERSION = 'v0.1';
+const CURRENT_VERSION = 'v0.2';
 const GITHUB_REPO     = 'JayMortal/Simple-Business-Websitebuilder';
 
 function checkForUpdates() {

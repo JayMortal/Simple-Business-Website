@@ -1,7 +1,6 @@
-// ===== main.js v0.1 =====
+// ===== main.js v0.2 =====
 
 const ADMIN_SESSION_KEY = 'adminLoggedIn';
-const API_TOKEN_KEY     = 'apiToken';
 
 // ── Header scroll
 const header = document.getElementById('siteHeader');
@@ -15,10 +14,15 @@ function toggleMobileMenu() {
 
 // ── Admin helpers
 function isAdminMode() { return localStorage.getItem(ADMIN_SESSION_KEY) === '1'; }
-function getApiToken()  { return sessionStorage.getItem(API_TOKEN_KEY) || ''; }
 
-// ── UI language helper (reads adminLang for admin-facing strings)
-function uiLang() { return localStorage.getItem('adminLang') || 'zh'; }
+// ── UI language helper
+// Reads stored preference; falls back to browser language (en unless zh-*)
+function uiLang() {
+  const stored = localStorage.getItem('adminLang');
+  if (stored) return stored;
+  const browser = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  return browser.startsWith('zh') ? 'zh' : 'en';
+}
 function ui(zh, en) { return uiLang() === 'en' ? en : zh; }
 
 // ── Theme colors
@@ -134,20 +138,18 @@ function collectAllData() {
   return data;
 }
 
-// ── Push to server
+// ── Push to server (session cookie is sent automatically by the browser)
 window.syncToServer = function(onSuccess, onError) {
-  const token = getApiToken();
-  if (!token) return;
-  fetch('api.php', {
+  fetch('/api/save', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'save', token, data: collectAllData() })
+    credentials: 'same-origin',
+    body: JSON.stringify({ data: collectAllData() })
   })
   .then(r => r.json())
   .then(resp => {
     if (resp.status === 'ok') { onSuccess && onSuccess(); }
-    else if (resp.error === 'invalid_token') {
-      sessionStorage.removeItem(API_TOKEN_KEY);
+    else if (resp.error === 'unauthenticated') {
       localStorage.removeItem(ADMIN_SESSION_KEY);
       showSiteToast(ui('⚠ 登录已过期，请重新登录后台', '⚠ Session expired. Please log in again.'));
     } else { onError && onError(resp.error); }
@@ -248,12 +250,7 @@ function saveFrontChanges() {
 
 function exitAdminMode() {
   if (!confirm(ui('确定退出编辑模式？', 'Exit edit mode?'))) return;
-  const token = getApiToken();
-  if (token) {
-    fetch('api.php', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'logout', token }) }).catch(() => {});
-  }
-  sessionStorage.removeItem(API_TOKEN_KEY);
+  fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
   localStorage.removeItem(ADMIN_SESSION_KEY);
   location.reload();
 }
@@ -309,7 +306,7 @@ function renderPage() {
 
 // ── INIT
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('api.php')
+  fetch('/api/data', { credentials: 'same-origin' })
     .then(r => { if (!r.ok) throw new Error('no api'); return r.json(); })
     .then(data => { hydrateFromServerData(data); })
     .catch(() => {})

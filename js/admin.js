@@ -9,57 +9,43 @@
 //  - hydrateFromServerData handles [] vs {} correctly
 
 const ADMIN_SESSION_KEY = 'adminLoggedIn';
-const API_TOKEN_KEY     = 'apiToken';
-const ATTEMPT_KEY       = 'adminAttempts';
-const LOCKOUT_KEY       = 'adminLockoutUntil';
-const MAX_ATTEMPTS      = 5;
-const LOCKOUT_MINUTES   = 15;
 
-// ── Brute force ──────────────────────────────────────────────────
-function getAttempts()     { return parseInt(localStorage.getItem(ATTEMPT_KEY) || '0'); }
-function getLockoutUntil() { return parseInt(localStorage.getItem(LOCKOUT_KEY) || '0'); }
-
-function isLockedOut() {
-  const until = getLockoutUntil();
-  if (until && Date.now() < until) return true;
-  if (until && Date.now() >= until) {
-    localStorage.removeItem(LOCKOUT_KEY); localStorage.removeItem(ATTEMPT_KEY);
-  }
-  return false;
-}
-function recordFailedAttempt() {
-  const n = getAttempts() + 1;
-  localStorage.setItem(ATTEMPT_KEY, n);
-  if (n >= MAX_ATTEMPTS) {
-    localStorage.setItem(LOCKOUT_KEY, Date.now() + LOCKOUT_MINUTES * 60000);
-    localStorage.removeItem(ATTEMPT_KEY); return true;
-  }
-  return false;
-}
-function resetFailures() { localStorage.removeItem(ATTEMPT_KEY); localStorage.removeItem(LOCKOUT_KEY); }
-
-function updateLockoutTimer() {
-  const until = getLockoutUntil();
+// ── Lockout timer (display only — rate limiting is server-side) ───
+function updateLockoutTimer(retryAfterSecs) {
   const lockEl = document.getElementById('lockoutMsg');
   const btnEl  = document.getElementById('loginBtn');
-  if (!until || Date.now() >= until) {
+  if (!retryAfterSecs) {
     if (lockEl) lockEl.style.display = 'none';
     if (btnEl)  btnEl.disabled = false;
     return;
   }
-  const rem = Math.ceil((until - Date.now()) / 1000);
-  if (lockEl) { lockEl.style.display='block'; lockEl.textContent=adminLang==='en'?`Account locked. Try again in ${Math.floor(rem/60)}:${String(rem%60).padStart(2,'0')}.`:`账户已锁定，请在 ${Math.floor(rem/60)}:${String(rem%60).padStart(2,'0')} 后重试`; }
-  if (btnEl) btnEl.disabled = true;
+  let remaining = retryAfterSecs;
+  if (lockEl) lockEl.style.display = 'block';
+  if (btnEl)  btnEl.disabled = true;
+  const tick = () => {
+    const m = Math.floor(remaining / 60), s = String(remaining % 60).padStart(2, '0');
+    if (lockEl) lockEl.textContent = adminLang === 'en'
+      ? `Account locked. Try again in ${m}:${s}.`
+      : `账户已锁定，请在 ${m}:${s} 后重试`;
+    if (remaining-- > 0) setTimeout(tick, 1000);
+    else updateLockoutTimer(0);
+  };
+  tick();
 }
 
-function getApiToken()  { return sessionStorage.getItem(API_TOKEN_KEY) || ''; }
-function setApiToken(t) { sessionStorage.setItem(API_TOKEN_KEY, t); }
-
 // ── Admin UI language (controls admin interface language) ─────────
-let adminLang = localStorage.getItem('adminLang') || 'zh';
+// Priority: stored preference → browser language → English fallback
+// A US user who has never visited gets English. A Chinese user gets Chinese.
+function detectAdminLang() {
+  const stored = localStorage.getItem('adminLang');
+  if (stored === 'zh' || stored === 'en') return stored;
+  const browser = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  return browser.startsWith('zh') ? 'zh' : 'en';
+}
+let adminLang = detectAdminLang();
 
 // ── Edit language (controls which language's content is being edited)
-let editLang  = localStorage.getItem('adminEditLang') || 'zh';
+let editLang  = localStorage.getItem('adminEditLang') || adminLang;
 
 const adminI18n = {
   zh: {
@@ -282,12 +268,24 @@ const adminUIStrings = {
 
 // ── Translate all admin UI elements with data-ail attribute ───────
 function translateAdminUI() {
-  const s = adminUIStrings[adminLang] || adminUIStrings.zh;
+  const s = adminUIStrings[adminLang] || adminUIStrings.en;
+  const t2 = adminI18n[adminLang] || adminI18n.en;
 
   // Translate text content
   document.querySelectorAll('[data-ail]').forEach(el => {
     const key = el.getAttribute('data-ail');
     if (s[key] !== undefined) el.textContent = s[key];
+    else if (t2[key] !== undefined) el.textContent = t2[key];
+  });
+
+  // Translate nav link labels (icon + text)
+  const navLabels = { home:'home', products:'products', about:'about', contact:'contact',
+                      buttons:'buttons', settings:'settings', theme:'theme',
+                      password:'password', update:'update', logoutBtn:'logoutBtn' };
+  document.querySelectorAll('[data-ail-nav]').forEach(el => {
+    const key = el.getAttribute('data-ail-nav');
+    const icon = el.textContent.trim().slice(0, 2);  // preserve emoji
+    if (t2[key]) el.textContent = icon + ' ' + t2[key];
   });
 
   // Translate placeholders
@@ -539,7 +537,7 @@ let currentPage        = 'home';
 let adminProductsData  = null;
 
 function initAdmin() {
-  fetch('api.php')
+  fetch('/api/data', { credentials: 'same-origin' })
     .then(r => r.json())
     .then(data => {
       if (typeof hydrateFromServerData === 'function') hydrateFromServerData(data);
@@ -624,11 +622,8 @@ function applyImgUrl(key) {
   }
 }
 
-// ── Sync to server
+// ── Sync to server (session cookie sent automatically)
 function syncAllToServer(onSuccess, onFail) {
-  const token = getApiToken();
-  if (!token) { onFail && onFail('no_token'); return; }
-
   const data = {
     editableContent:{}, editableImages:{}, btnActions:{},
     productsData: adminProductsData || ProductsDB.load(),
@@ -642,13 +637,13 @@ function syncAllToServer(onSuccess, onFail) {
     else if (k.startsWith('btn_action_')) data.btnActions[k.replace('btn_action_','')] = localStorage.getItem(k);
   }
 
-  fetch('api.php', { method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ action:'save', token, data }) })
+  fetch('/api/save', { method:'POST', headers:{'Content-Type':'application/json'},
+    credentials: 'same-origin', body: JSON.stringify({ data }) })
   .then(r => r.json())
   .then(resp => {
     if (resp.status==='ok') { onSuccess && onSuccess(); }
-    else if (resp.error==='invalid_token') {
-      sessionStorage.removeItem(API_TOKEN_KEY); localStorage.removeItem(ADMIN_SESSION_KEY);
+    else if (resp.error==='unauthenticated') {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
       showAdminToast(t('tokenExpired'), 'error');
       setTimeout(() => location.reload(), 2000);
     } else { onFail && onFail(resp.error); }
@@ -926,20 +921,18 @@ function changePassword(){
   const msg=document.getElementById('pwdMsg');
   if(np.length<6){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Password must be at least 6 characters':'新密码至少6位';msg.style.display='block';return;}
   if(np!==cp){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Passwords do not match':'两次密码不一致';msg.style.display='block';return;}
-  const token=getApiToken();
-  if(!token){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Please log in again first':'请重新登录后再修改密码';msg.style.display='block';return;}
-  fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change_password',token,current:cur,new:np})})
+  fetch('/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({current:cur,newPassword:np})})
   .then(r=>r.json())
   .then(resp=>{
     if(resp.status==='ok'){
       msg.className='admin-msg success';msg.textContent=adminLang==='en'?'Password changed! Logging out in 2s...':'密码修改成功！2秒后重新登录...';msg.style.display='block';
       ['curPwd','newPwd','confirmPwd'].forEach(id=>document.getElementById(id).value='');
-      setTimeout(()=>{sessionStorage.removeItem(API_TOKEN_KEY);localStorage.removeItem(ADMIN_SESSION_KEY);location.reload();},2000);
+      setTimeout(()=>{localStorage.removeItem(ADMIN_SESSION_KEY);location.reload();},2000);
     }else if(resp.error==='wrong_current_password'){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Current password is incorrect':'当前密码错误';msg.style.display='block';}
-    else if(resp.error==='invalid_token'){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Session expired. Please log in again':'登录已过期，请重新登录';msg.style.display='block';}
+    else if(resp.error==='unauthenticated'){msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Session expired. Please log in again':'登录已过期，请重新登录';msg.style.display='block';}
     else{msg.className='admin-msg error';msg.textContent=(adminLang==='en'?'Failed: ':'修改失败：')+resp.error;msg.style.display='block';}
   })
-  .catch(()=>{msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Cannot reach server. Ensure api.php is deployed correctly':'无法连接服务器，请确认api.php已正确部署';msg.style.display='block';});
+  .catch(()=>{msg.className='admin-msg error';msg.textContent=adminLang==='en'?'Cannot reach server':'无法连接服务器';msg.style.display='block';});
 }
 
 // ── Data management
@@ -970,7 +963,7 @@ function importData(input){
 }
 function resetData(){
   if(!confirm(t('resetConfirm')))return;
-  const keep=[ATTEMPT_KEY,LOCKOUT_KEY,API_TOKEN_KEY,'adminLang','adminEditLang','lang'];
+  const keep=['adminLang','adminEditLang','lang'];
   const keys=[];for(let i=0;i<localStorage.length;i++)keys.push(localStorage.key(i));
   keys.filter(k=>!keep.includes(k)&&(k.startsWith('edit_')||k==='productsData'||k.startsWith('theme.')||k.startsWith('btn_action_')||k===ADMIN_SESSION_KEY)).forEach(k=>localStorage.removeItem(k));
   adminProductsData=ProductsDB.reset();loadAllFields();renderAdminCategories();
@@ -986,40 +979,26 @@ function showAdminToast(msg,type='success'){
 
 // ── Login
 function doLogin(){
-  if(isLockedOut()){updateLockoutTimer();return;}
   const password=document.getElementById('adminPassword').value;
   const btn=document.getElementById('loginBtn');
   if(btn){btn.disabled=true;btn.textContent=adminLang==='en'?'Verifying...':'验证中...';}
-  fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password})})
+  fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password})})
   .then(r=>r.json())
   .then(resp=>{
-    if(resp.status==='ok'&&resp.token){
-      resetFailures();setApiToken(resp.token);localStorage.setItem(ADMIN_SESSION_KEY,'1');
+    if(resp.status==='ok'){
+      localStorage.setItem(ADMIN_SESSION_KEY,'1');
       document.getElementById('loginOverlay').style.display='none';
       document.getElementById('adminPanel').style.display='flex';
       initAdmin();
     }else if(resp.error==='wrong_password'){
       handleLoginFail(adminLang==='en'?`Wrong password. ${resp.remaining} attempt(s) left.`:`密码错误，还可尝试 ${resp.remaining} 次`);
     }else if(resp.error==='locked'){
-      handleLoginFail(adminLang==='en'?`Account locked. Try again in ${Math.floor(resp.retry_after/60)} min.`:`服务器：账户已锁定，请 ${Math.floor(resp.retry_after/60)} 分钟后重试`);
-      if(btn)btn.disabled=true;
+      handleLoginFail(adminLang==='en'?`Account locked. Try again in ${Math.floor(resp.retry_after/60)} min.`:`账户已锁定，请 ${Math.floor(resp.retry_after/60)} 分钟后重试`);
+      updateLockoutTimer(resp.retry_after);
     }else{handleLoginFail((adminLang==='en'?'Login failed: ':'登录失败：')+(resp.error||'unknown'));}
   })
-  .catch(()=>{
-    // Fallback: localStorage password for environments without api.php
-    const storedPwd=localStorage.getItem('adminPassword')||'admin123';
-    if(password===storedPwd){
-      resetFailures();localStorage.setItem(ADMIN_SESSION_KEY,'1');
-      document.getElementById('loginOverlay').style.display='none';
-      document.getElementById('adminPanel').style.display='flex';
-      initAdmin();
-      showAdminToast(adminLang==='en'?'⚠ Offline mode: changes saved locally only. Deploy api.php for full functionality.':'⚠ 离线模式：修改仅本地有效，请确认api.php已部署','error');
-    }else{
-      const locked=recordFailedAttempt();
-      handleLoginFail(locked?(adminLang==='en'?`Too many attempts. Account locked for ${LOCKOUT_MINUTES} min.`:`密码错误次数过多，账户已锁定 ${LOCKOUT_MINUTES} 分钟`):(adminLang==='en'?`Wrong password. ${MAX_ATTEMPTS-getAttempts()} attempt(s) left.`:`密码错误，还可尝试 ${MAX_ATTEMPTS-getAttempts()} 次`));
-    }
-  })
-  .finally(()=>{if(btn&&!isLockedOut()){btn.disabled=false;btn.textContent=adminLang==='en'?'Log In':'登 录';}});
+  .catch(()=>handleLoginFail(adminLang==='en'?'Cannot reach server':'无法连接服务器'))
+  .finally(()=>{if(btn){btn.disabled=false;btn.textContent=adminLang==='en'?'Log In':'登 录';}});
 }
 
 function handleLoginFail(msg){
@@ -1027,13 +1006,11 @@ function handleLoginFail(msg){
   if(errEl){errEl.textContent=msg;errEl.classList.add('show');}
   document.getElementById('adminPassword').value='';
   document.getElementById('adminPassword').focus();
-  if(isLockedOut())updateLockoutTimer();
 }
 
 function doLogout(){
-  const token=getApiToken();
-  if(token)fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token})}).catch(()=>{});
-  sessionStorage.removeItem(API_TOKEN_KEY);localStorage.removeItem(ADMIN_SESSION_KEY);
+  fetch('/api/logout',{method:'POST',credentials:'same-origin'}).catch(()=>{});
+  localStorage.removeItem(ADMIN_SESSION_KEY);
   document.getElementById('adminPanel').style.display='none';
   document.getElementById('loginOverlay').style.display='flex';
   document.getElementById('adminPassword').value='';
@@ -1041,29 +1018,24 @@ function doLogout(){
 
 // ── INIT
 document.addEventListener('DOMContentLoaded',()=>{
-  if(localStorage.getItem(ADMIN_SESSION_KEY)==='1'&&getApiToken()){
-    fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'check_token',token:getApiToken()})})
-    .then(r=>r.json())
-    .then(resp=>{
-      if(resp.valid){
-        document.getElementById('loginOverlay').style.display='none';
-        document.getElementById('adminPanel').style.display='flex';
-        initAdmin();
-      }else{sessionStorage.removeItem(API_TOKEN_KEY);localStorage.removeItem(ADMIN_SESSION_KEY);}
-    })
-    .catch(()=>{
-      if(localStorage.getItem(ADMIN_SESSION_KEY)==='1'){
-        document.getElementById('loginOverlay').style.display='none';
-        document.getElementById('adminPanel').style.display='flex';
-        initAdmin();
-      }
-    });
-  }else if(localStorage.getItem(ADMIN_SESSION_KEY)==='1'){
-    localStorage.removeItem(ADMIN_SESSION_KEY);
-  }
-  if(isLockedOut()){
-    updateLockoutTimer();
-    const timer=setInterval(()=>{updateLockoutTimer();if(!isLockedOut())clearInterval(timer);},1000);
-  }
+  // Apply language before showing any UI (prevents Chinese flash for English users)
+  translateLoginPage();
+  translateAdminUI();
+
+  // Check if server session is still valid
+  fetch('/api/check-auth',{credentials:'same-origin'})
+  .then(r=>r.json())
+  .then(resp=>{
+    if(resp.authenticated){
+      localStorage.setItem(ADMIN_SESSION_KEY,'1');
+      document.getElementById('loginOverlay').style.display='none';
+      document.getElementById('adminPanel').style.display='flex';
+      initAdmin();
+    }else{
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+  })
+  .catch(()=>{ /* server unreachable — stay on login screen */ });
+
   document.getElementById('adminPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
